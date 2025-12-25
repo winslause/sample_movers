@@ -1,0 +1,2008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Listings | Movers & Homes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+        :root {
+            --primary-blue: #0a2463;
+            --secondary-blue: #3e78b2;
+            --accent-orange: #ff6b35;
+            --accent-teal: #4ecdc4;
+            --dark-gray: #0f172a;
+            --light-gray: #f8f9fa;
+            --card-bg: #1e293b;
+            --text-primary: #ffffff;
+            --text-secondary: #cbd5e1;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-gray);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100vw;
+        }
+        
+        /* Navigation */
+        .glass-nav {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Search Section */
+        .search-container {
+            background: rgba(30, 41, 59, 0.9);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Property Cards - FIXED VISIBILITY */
+        .property-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .property-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent-teal);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        .property-card img {
+            transition: transform 0.5s ease;
+        }
+        
+        .property-card:hover img {
+            transform: scale(1.05);
+        }
+        
+        /* Filters */
+        .filter-pill {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+        
+        .filter-pill:hover {
+            background: rgba(78, 205, 196, 0.2);
+            border-color: var(--accent-teal);
+        }
+        
+        .filter-pill.active {
+            background: linear-gradient(135deg, var(--accent-teal), var(--secondary-blue));
+            border-color: transparent;
+            color: white;
+            font-weight: 600;
+        }
+        
+        /* Price Tag */
+        .price-tag {
+            background: rgba(10, 36, 99, 0.9);
+            border: 1px solid rgba(62, 120, 178, 0.5);
+            color: white;
+            font-weight: 600;
+        }
+        
+        /* Featured Badge */
+        .featured-badge {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #000;
+            font-weight: 600;
+        }
+        
+        /* Pagination */
+        .pagination-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+        
+        .pagination-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-teal);
+        }
+        
+        .pagination-btn.active {
+            background: linear-gradient(135deg, var(--accent-teal), var(--secondary-blue));
+            border-color: transparent;
+            color: white;
+            font-weight: 600;
+        }
+        
+        /* Text Colors */
+        .text-primary {
+            color: var(--text-primary);
+        }
+        
+        .text-secondary {
+            color: var(--text-secondary);
+        }
+        
+        /* Modal Styles (Same as homepage) */
+        .property-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+            padding: 1rem;
+        }
+        
+        .property-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: rgba(30, 41, 59, 0.98);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            max-width: 1000px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.9);
+            opacity: 0;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+        
+        .property-modal.active .modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .modal-close:hover {
+            background: rgba(255, 107, 53, 0.8);
+            transform: rotate(90deg);
+        }
+        
+        /* Custom Scrollbar */
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .modal-content::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+        
+        .modal-content::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, var(--accent-teal), var(--secondary-blue));
+            border-radius: 4px;
+        }
+        
+        /* Animation Classes */
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .slide-up {
+            animation: slideUp 0.5s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Gradient Text */
+        .gradient-text {
+            background: linear-gradient(135deg, #ffffff 0%, #93c5fd 50%, #4ecdc4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Section Headers */
+        .section-header {
+            position: relative;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .section-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-teal), var(--accent-orange));
+            border-radius: 2px;
+        }
+        
+        /* Load More Button */
+        .load-more-btn {
+            background: linear-gradient(135deg, var(--secondary-blue), var(--accent-teal));
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .load-more-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(62, 120, 178, 0.4);
+        }
+        
+        /* Favorite Button */
+        .favorite-btn {
+            background: rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .favorite-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+        
+        /* Input Fields */
+        input, select {
+            background: rgba(15, 23, 42, 0.7);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-teal);
+            box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
+        }
+        
+        /* Footer */
+        .footer {
+            background: rgba(15, 23, 42, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Fix for responsive spacing */
+        @media (max-width: 640px) {
+            body {
+                padding-right: 0 !important;
+            }
+            
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            section {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            
+            .grid {
+                gap: 1rem;
+            }
+            
+            .property-card {
+                width: 100%;
+            }
+        }
+        /* Fix for property cards in all sections */
+.property-card {
+    background: var(--card-bg) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Ensure card content is visible */
+.property-card * {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Fix for card images */
+.property-card img {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+
+/* Make sure card is not hidden by any parent */
+section.bg-gray-900\/30 {
+    background: rgba(17, 24, 39, 0.3) !important;
+}
+
+/* Fix for grid container */
+.grid.grid-cols-1.md\:grid-cols-2.lg\:grid-cols-4.gap-6 {
+    display: grid !important;
+    grid-template-columns: repeat(1, 1fr) !important;
+}
+
+@media (min-width: 768px) {
+    .grid.grid-cols-1.md\:grid-cols-2.lg\:grid-cols-4.gap-6 {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (min-width: 1024px) {
+    .grid.grid-cols-1.md\:grid-cols-2.lg\:grid-cols-4.gap-6 {
+        grid-template-columns: repeat(4, 1fr) !important;
+    }
+}
+    </style>
+</head>
+<body class="bg-dark-gray text-primary">
+    <!-- Navigation -->
+    <nav class="glass-nav fixed top-0 left-0 right-0 z-50 py-4">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="relative">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-teal-400 flex items-center justify-center shadow-lg">
+                            <i class="fas fa-home text-white text-xl"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h1 class="logo-text text-2xl font-bold tracking-tight">Movers<span class="text-white">&</span>Homes</h1>
+                        <p class="text-secondary text-xs">Find Your Dream Home</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Menu -->
+                <div class="hidden lg:flex items-center space-x-6">
+                    <a href="index.html" class="text-secondary hover:text-white transition-colors duration-300">
+                        Home
+                    </a>
+                    <a href="#" class="text-white font-medium border-b-2 border-teal-400 pb-1">
+                        Houses
+                    </a>
+                    <a href="#" class="text-secondary hover:text-white transition-colors duration-300">
+                        Moving Services
+                    </a>
+                    <a href="#" class="text-secondary hover:text-white transition-colors duration-300">
+                        How It Works
+                    </a>
+                </div>
+
+                <!-- User Actions -->
+                <div class="flex items-center space-x-3">
+                    <button class="px-4 py-2 rounded-lg bg-gray-800 text-secondary hover:text-white hover:bg-gray-700 transition-colors duration-300">
+                        <i class="fas fa-user mr-2"></i>Sign In
+                    </button>
+                    <button class="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-teal-500 text-white hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300">
+                        <i class="fas fa-plus mr-2"></i>List Property
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="pt-32 pb-12 px-4">
+        <div class="container mx-auto">
+            <div class="text-center max-w-3xl mx-auto mb-8">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4 gradient-text">
+                    Discover Your Dream Home
+                </h1>
+                <p class="text-lg text-secondary">
+                    Browse thousands of verified properties with complete transparency. Find the perfect home that matches your lifestyle.
+                </p>
+            </div>
+
+            <!-- Search & Filters -->
+            <div class="search-container p-6 mb-8">
+                <div class="flex flex-col md:flex-row items-center gap-4 mb-6">
+                    <!-- Location Search -->
+                    <div class="flex-1 w-full">
+                        <div class="relative">
+                            <i class="fas fa-map-marker-alt absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" 
+                                   placeholder="Search by location, city, or neighborhood..." 
+                                   class="w-full pl-12 pr-4 py-3 rounded-xl bg-gray-900 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-teal-500 transition-colors duration-300">
+                        </div>
+                    </div>
+                    
+                    <!-- Property Type -->
+                    <div class="w-full md:w-auto">
+                        <select class="w-full md:w-48 px-4 py-3 rounded-xl bg-gray-900 border border-gray-700 text-white focus:outline-none focus:border-teal-500 transition-colors duration-300">
+                            <option value="">Property Type</option>
+                            <option value="apartment">Apartment</option>
+                            <option value="house">House</option>
+                            <option value="villa">Villa</option>
+                            <option value="townhouse">Townhouse</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Price Range -->
+                    <div class="w-full md:w-auto">
+                        <select class="w-full md:w-48 px-4 py-3 rounded-xl bg-gray-900 border border-gray-700 text-white focus:outline-none focus:border-teal-500 transition-colors duration-300">
+                            <option value="">Price Range</option>
+                            <option value="0-5m">Below Ksh 5M</option>
+                            <option value="5-10m">Ksh 5M - 10M</option>
+                            <option value="10-20m">Ksh 10M - 20M</option>
+                            <option value="20-50m">Ksh 20M - 50M</option>
+                            <option value="50m+">Above Ksh 50M</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Search Button -->
+                    <button class="w-full md:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-teal-500 text-white font-semibold hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300">
+                        <i class="fas fa-search mr-2"></i>Search
+                    </button>
+                </div>
+                
+                <!-- Quick Filters -->
+                <div class="flex flex-wrap gap-3">
+                    <button class="filter-pill px-4 py-2 rounded-full text-sm font-medium active">For Sale</button>
+                    <button class="filter-pill px-4 py-2 rounded-full text-sm font-medium">For Rent</button>
+                    <button class="filter-pill px-4 py-2 rounded-full text-sm font-medium">Featured</button>
+                    <button class="filter-pill px-4 py-2 rounded-full text-sm font-medium">New Today</button>
+                    <button class="filter-pill px-4 py-2 rounded-full text-sm font-medium">Pet Friendly</button>
+                    <button class="filter-pill px-4 py-2 rounded-full text-sm font-medium">Pool</button>
+                    <button class="filter-pill px-4 py-2 rounded-full text-sm font-medium">Garden</button>
+                    <button class="filter-pill px-4 py-2 rounded-full text-sm font-medium">Security</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Nearby Houses Section -->
+    <section class="py-8 px-4 bg-gray-900/30">
+        <div class="container mx-auto">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold mb-1">🏠 Houses Near You</h2>
+                    <p class="text-secondary">Properties in your preferred locations</p>
+                </div>
+                <button class="text-teal-400 hover:text-teal-300 transition-colors duration-300 text-sm">
+                    View All Nearby <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Nearby House 1 - NOW VISIBLE -->
+                <div class="property-card" data-house-id="1">
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                             alt="Modern Villa" 
+                             class="w-full h-full object-cover">
+                        <div class="absolute top-4 left-4">
+                            <span class="px-3 py-1 rounded-full bg-gradient-to-r from-blue-600 to-teal-500 text-white text-sm font-medium">
+                                For Sale
+                            </span>
+                        </div>
+                        <div class="absolute top-4 right-4">
+                            <button class="favorite-btn w-10 h-10 rounded-full bg-black/60 flex items-center justify-center hover:bg-red-500/30 transition-colors duration-300">
+                                <i class="fas fa-heart text-white"></i>
+                            </button>
+                        </div>
+                        <div class="absolute bottom-4 left-4">
+                            <div class="price-tag px-3 py-2 rounded-lg">
+                                <div class="text-xl font-bold text-white">Ksh 65M</div>
+                                <div class="text-gray-300 text-xs">KES</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold text-white mb-2">Modern Villa with Pool</h3>
+                        <div class="flex items-center text-gray-400 text-sm mb-3">
+                            <i class="fas fa-map-marker-alt text-teal-400 mr-2"></i>
+                            <span>Karen, Nairobi</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <div class="flex items-center">
+                                <i class="fas fa-bed text-blue-400 mr-1"></i>
+                                <span class="text-gray-300 mr-3">4 Beds</span>
+                                <i class="fas fa-bath text-teal-400 mr-1"></i>
+                                <span class="text-gray-300 mr-3">3 Baths</span>
+                                <i class="fas fa-ruler-combined text-orange-400 mr-1"></i>
+                                <span class="text-gray-300">2800 sq ft</span>
+                            </div>
+                            <div class="flex items-center text-amber-400">
+                                <i class="fas fa-star"></i>
+                                <span class="ml-1">4.8</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nearby House 2 -->
+                <div class="property-card" data-house-id="2">
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1518780664697-55e3ad937233?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                             alt="Luxury Apartment" 
+                             class="w-full h-full object-cover">
+                        <div class="absolute top-4 left-4">
+                            <span class="px-3 py-1 rounded-full bg-gradient-to-r from-orange-500 to-red-500 text-white text-sm font-medium">
+                                For Rent
+                            </span>
+                        </div>
+                        <div class="absolute top-4 right-4">
+                            <button class="favorite-btn w-10 h-10 rounded-full bg-black/60 flex items-center justify-center hover:bg-red-500/30 transition-colors duration-300">
+                                <i class="far fa-heart text-white"></i>
+                            </button>
+                        </div>
+                        <div class="absolute bottom-4 left-4">
+                            <div class="price-tag px-3 py-2 rounded-lg">
+                                <div class="text-xl font-bold text-white">Ksh 320K</div>
+                                <div class="text-gray-300 text-xs">/month</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold text-white mb-2">Kilimani Luxury Apartment</h3>
+                        <div class="flex items-center text-gray-400 text-sm mb-3">
+                            <i class="fas fa-map-marker-alt text-teal-400 mr-2"></i>
+                            <span>Kilimani, Nairobi</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <div class="flex items-center">
+                                <i class="fas fa-bed text-blue-400 mr-1"></i>
+                                <span class="text-gray-300 mr-3">2 Beds</span>
+                                <i class="fas fa-bath text-teal-400 mr-1"></i>
+                                <span class="text-gray-300 mr-3">2 Baths</span>
+                                <i class="fas fa-ruler-combined text-orange-400 mr-1"></i>
+                                <span class="text-gray-300">1200 sq ft</span>
+                            </div>
+                            <div class="flex items-center text-amber-400">
+                                <i class="fas fa-star"></i>
+                                <span class="ml-1">4.9</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nearby House 3 -->
+                <div class="property-card" data-house-id="3">
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1565538810643-b5bdb714032a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                             alt="Family Home" 
+                             class="w-full h-full object-cover">
+                        <div class="absolute top-4 left-4">
+                            <span class="px-3 py-1 rounded-full bg-gradient-to-r from-blue-600 to-teal-500 text-white text-sm font-medium">
+                                For Sale
+                            </span>
+                        </div>
+                        <div class="absolute top-4 right-4">
+                            <span class="featured-badge px-3 py-1 rounded-full text-sm font-medium">
+                                Featured
+                            </span>
+                        </div>
+                        <div class="absolute top-14 right-4">
+                            <button class="favorite-btn w-10 h-10 rounded-full bg-black/60 flex items-center justify-center hover:bg-red-500/30 transition-colors duration-300">
+                                <i class="fas fa-heart text-white"></i>
+                            </button>
+                        </div>
+                        <div class="absolute bottom-4 left-4">
+                            <div class="price-tag px-3 py-2 rounded-lg">
+                                <div class="text-xl font-bold text-white">Ksh 47.5M</div>
+                                <div class="text-gray-300 text-xs">KES</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold text-white mb-2">Runda Family Home</h3>
+                        <div class="flex items-center text-gray-400 text-sm mb-3">
+                            <i class="fas fa-map-marker-alt text-teal-400 mr-2"></i>
+                            <span>Runda, Nairobi</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <div class="flex items-center">
+                                <i class="fas fa-bed text-blue-400 mr-1"></i>
+                                <span class="text-gray-300 mr-3">3 Beds</span>
+                                <i class="fas fa-bath text-teal-400 mr-1"></i>
+                                <span class="text-gray-300 mr-3">2.5 Baths</span>
+                                <i class="fas fa-ruler-combined text-orange-400 mr-1"></i>
+                                <span class="text-gray-300">2100 sq ft</span>
+                            </div>
+                            <div class="flex items-center text-amber-400">
+                                <i class="fas fa-star"></i>
+                                <span class="ml-1">4.7</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nearby House 4 -->
+                <div class="property-card" data-house-id="4">
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                             alt="Penthouse" 
+                             class="w-full h-full object-cover">
+                        <div class="absolute top-4 left-4">
+                            <span class="px-3 py-1 rounded-full bg-gradient-to-r from-blue-600 to-teal-500 text-white text-sm font-medium">
+                                For Sale
+                            </span>
+                        </div>
+                        <div class="absolute top-4 right-4">
+                            <button class="favorite-btn w-10 h-10 rounded-full bg-black/60 flex items-center justify-center hover:bg-red-500/30 transition-colors duration-300">
+                                <i class="far fa-heart text-white"></i>
+                            </button>
+                        </div>
+                        <div class="absolute bottom-4 left-4">
+                            <div class="price-tag px-3 py-2 rounded-lg">
+                                <div class="text-xl font-bold text-white">Ksh 85M</div>
+                                <div class="text-gray-300 text-xs">KES</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold text-white mb-2">Westlands Penthouse</h3>
+                        <div class="flex items-center text-gray-400 text-sm mb-3">
+                            <i class="fas fa-map-marker-alt text-teal-400 mr-2"></i>
+                            <span>Westlands, Nairobi</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <div class="flex items-center">
+                                <i class="fas fa-bed text-blue-400 mr-1"></i>
+                                <span class="text-gray-300 mr-3">4 Beds</span>
+                                <i class="fas fa-bath text-teal-400 mr-1"></i>
+                                <span class="text-gray-300 mr-3">3.5 Baths</span>
+                                <i class="fas fa-ruler-combined text-orange-400 mr-1"></i>
+                                <span class="text-gray-300">3200 sq ft</span>
+                            </div>
+                            <div class="flex items-center text-amber-400">
+                                <i class="fas fa-star"></i>
+                                <span class="ml-1">4.9</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- All House Listings Section -->
+    <section class="py-12 px-4">
+        <div class="container mx-auto">
+            <div class="flex items-center justify-between mb-8">
+                <div class="section-header">
+                    <h2 class="text-2xl font-bold">All House Listings</h2>
+                    <p class="text-secondary mt-1">Showing <span class="text-white font-medium">24</span> properties</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <select class="px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:border-teal-500 transition-colors duration-300">
+                        <option value="latest">Sort by: Latest</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="popular">Most Popular</option>
+                    </select>
+                    <button class="px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white hover:bg-gray-700 transition-colors duration-300">
+                        <i class="fas fa-map-marker-alt mr-2"></i>Map View
+                    </button>
+                </div>
+            </div>
+            
+            <!-- House Listings Grid -->
+            <div id="housesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                <!-- Houses will be loaded here -->
+            </div>
+            
+            <!-- Pagination / Load More -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="text-secondary">
+                    Page <span class="text-white font-medium">1</span> of <span class="text-white font-medium">6</span>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="flex items-center space-x-2">
+                    <button class="pagination-btn w-10 h-10 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="pagination-btn w-10 h-10 rounded-lg flex items-center justify-center active">1</button>
+                    <button class="pagination-btn w-10 h-10 rounded-lg flex items-center justify-center">2</button>
+                    <button class="pagination-btn w-10 h-10 rounded-lg flex items-center justify-center">3</button>
+                    <button class="pagination-btn w-10 h-10 rounded-lg flex items-center justify-center">4</button>
+                    <button class="pagination-btn w-10 h-10 rounded-lg flex items-center justify-center">5</button>
+                    <button class="pagination-btn w-10 h-10 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                
+                <!-- Load More Button -->
+                <button id="loadMoreBtn" class="load-more-btn px-6 py-3 rounded-xl text-white font-semibold">
+                    <span>Load More Properties</span>
+                    <i class="fas fa-arrow-down ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer py-8 px-4">
+        <div class="container mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-teal-400 flex items-center justify-center">
+                            <i class="fas fa-home text-white"></i>
+                        </div>
+                        <div>
+                            <h1 class="logo-text text-xl font-bold tracking-tight">Movers<span class="text-white">&</span>Homes</h1>
+                            <p class="text-secondary text-xs">Seamless Relocation Experience</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex space-x-6">
+                    <a href="#" class="text-secondary hover:text-white transition-colors duration-300">Terms</a>
+                    <a href="#" class="text-secondary hover:text-white transition-colors duration-300">Privacy</a>
+                    <a href="#" class="text-secondary hover:text-white transition-colors duration-300">Contact</a>
+                    <a href="#" class="text-secondary hover:text-white transition-colors duration-300">Help</a>
+                </div>
+            </div>
+            
+            <div class="text-center mt-8 text-gray-500 text-sm">
+                © 2024 Movers & Homes. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- House Data (Same structure as homepage) -->
+    <script>
+        // House data with all details for modals
+        const houseData = {
+            '1': {
+                title: 'Modern Villa with Infinity Pool',
+                location: 'Karen, Nairobi',
+                price: 'Ksh 65,000,000',
+                type: 'For Sale',
+                description: 'Stunning modern villa with panoramic views, infinity pool, and smart home features. This luxurious property features floor-to-ceiling windows, a state-of-the-art kitchen, and expansive outdoor living spaces. The master suite includes a private balcony overlooking the lush gardens.',
+                bedrooms: 4,
+                bathrooms: 3,
+                sqft: 2800,
+                yearBuilt: 2020,
+                parking: 2,
+                rating: 4.8,
+                images: [
+                    'https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+                    'https://images.unsplash.com/photo-1613490493576-7fde63acd811?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+                ],
+                amenities: [
+                    'Infinity Pool',
+                    'Smart Home System',
+                    'Security System',
+                    'Garden',
+                    'Garage (3 cars)',
+                    'Central AC',
+                    'Home Theater',
+                    'Wine Cellar',
+                    'Solar Panels'
+                ],
+                owner: {
+                    name: 'John Mwangi',
+                    phone: '+254 712 345 678',
+                    email: 'john@movershomes.co.ke',
+                    rating: 4.8,
+                    properties: 8,
+                    responseTime: '2 hours'
+                },
+                locationDetails: {
+                    nearby: [
+                        { name: 'Shopping Mall', distance: '5 min drive' },
+                        { name: 'International School', distance: '10 min drive' },
+                        { name: 'Hospital', distance: '8 min drive' },
+                        { name: 'Restaurants', distance: '3 min drive' }
+                    ],
+                    features: [
+                        '24/7 Security Patrol',
+                        'Gated Community',
+                        'Quiet Residential Area',
+                        'Park & Green Spaces',
+                        'Fiber Internet Available',
+                        'Close to Nature Reserves'
+                    ]
+                },
+                pricing: {
+                    propertyPrice: 'Ksh 63,000,000',
+                    legalFees: 'Ksh 630,000',
+                    stampDuty: 'Ksh 2,520,000',
+                    agentCommission: 'Ksh 1,260,000',
+                    total: 'Ksh 67,410,000'
+                },
+                similarHouses: [2, 3, 4]
+            },
+            '2': {
+                title: 'Kilimani Luxury Apartment',
+                location: 'Kilimani, Nairobi',
+                price: 'Ksh 320,000 /month',
+                type: 'For Rent',
+                description: 'High-floor apartment with breathtaking city views, modern amenities, and 24/7 security. This premium apartment features an open-plan living area, gourmet kitchen with granite countertops, and a private balcony perfect for entertaining.',
+                bedrooms: 2,
+                bathrooms: 2,
+                sqft: 1200,
+                yearBuilt: 2019,
+                parking: 1,
+                rating: 4.9,
+                images: [
+                    'https://images.unsplash.com/photo-1518780664697-55e3ad937233?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+                    'https://images.unsplash.com/photo-1560185893-a55cbc8c57e8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+                ],
+                amenities: [
+                    '24/7 Security',
+                    'Swimming Pool',
+                    'Gym',
+                    'Concierge',
+                    'Balcony',
+                    'Underground Parking',
+                    'Elevator',
+                    'High-Speed Internet',
+                    'Pet Friendly'
+                ],
+                owner: {
+                    name: 'Sarah Wanjiku',
+                    phone: '+254 723 456 789',
+                    email: 'sarah@movershomes.co.ke',
+                    rating: 4.9,
+                    properties: 5,
+                    responseTime: '1 hour'
+                },
+                locationDetails: {
+                    nearby: [
+                        { name: 'Supermarket', distance: '3 min walk' },
+                        { name: 'Gym', distance: '5 min walk' },
+                        { name: 'Restaurants', distance: '2 min walk' },
+                        { name: 'Public Transport', distance: '5 min walk' }
+                    ],
+                    features: [
+                        'Central Location',
+                        'Walking Distance to Shops',
+                        'Public Transport Access',
+                        'Vibrant Neighborhood',
+                        'Security Building',
+                        'Concierge Service'
+                    ]
+                },
+                pricing: {
+                    monthlyRent: 'Ksh 320,000',
+                    deposit: 'Ksh 960,000',
+                    serviceCharge: 'Ksh 15,000/month',
+                    totalMonthly: 'Ksh 335,000'
+                },
+                similarHouses: [1, 3, 4]
+            },
+            '3': {
+                title: 'Runda Family Home',
+                location: 'Runda, Nairobi',
+                price: 'Ksh 47,500,000',
+                type: 'For Sale',
+                description: 'Spacious family home in quiet neighborhood with large backyard, modern kitchen, and excellent schools nearby. This charming property features a covered patio, children\'s play area, and a beautifully landscaped garden.',
+                bedrooms: 3,
+                bathrooms: 2.5,
+                sqft: 2100,
+                yearBuilt: 2015,
+                parking: 3,
+                rating: 4.7,
+                images: [
+                    'https://images.unsplash.com/photo-1565538810643-b5bdb714032a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+                    'https://images.unsplash.com/photo-1570129477492-45c003edd2be?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1558036117-15e82a2c9a9a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1558036117-15e82a2c9a9a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+                ],
+                amenities: [
+                    'Garden',
+                    'Play Area',
+                    'Security System',
+                    'Garage',
+                    'Storage',
+                    'Solar Panels',
+                    'Water Tank',
+                    'Quiet Neighborhood',
+                    'Near Schools'
+                ],
+                owner: {
+                    name: 'David Omondi',
+                    phone: '+254 734 567 890',
+                    email: 'david@movershomes.co.ke',
+                    rating: 4.7,
+                    properties: 3,
+                    responseTime: '3 hours'
+                },
+                locationDetails: {
+                    nearby: [
+                        { name: 'International School', distance: '5 min drive' },
+                        { name: 'Shopping Center', distance: '8 min drive' },
+                        { name: 'Park', distance: '2 min walk' },
+                        { name: 'Golf Course', distance: '10 min drive' }
+                    ],
+                    features: [
+                        'Family-Friendly',
+                        'Quiet Streets',
+                        'Good Schools Nearby',
+                        'Community Feel',
+                        'Green Spaces',
+                        'Low Traffic'
+                    ]
+                },
+                pricing: {
+                    propertyPrice: 'Ksh 47,500,000',
+                    legalFees: 'Ksh 475,000',
+                    stampDuty: 'Ksh 1,900,000',
+                    agentCommission: 'Ksh 950,000',
+                    total: 'Ksh 50,825,000'
+                },
+                similarHouses: [1, 2, 4]
+            },
+            '4': {
+                title: 'Westlands Penthouse',
+                location: 'Westlands, Nairobi',
+                price: 'Ksh 85,000,000',
+                type: 'For Sale',
+                description: 'Luxury penthouse with panoramic city views, private rooftop terrace, and premium finishes throughout. Features include a chef\'s kitchen, home automation system, and panoramic elevator.',
+                bedrooms: 4,
+                bathrooms: 3.5,
+                sqft: 3200,
+                yearBuilt: 2021,
+                parking: 3,
+                rating: 4.9,
+                images: [
+                    'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+                    'https://images.unsplash.com/photo-1613977257363-707ba9348227?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+                ],
+                amenities: [
+                    'Rooftop Terrace',
+                    'Private Elevator',
+                    'Smart Home',
+                    'Wine Cellar',
+                    'Home Office',
+                    'Panoramic Views',
+                    'Concierge',
+                    'Gym Access',
+                    'Valet Parking'
+                ],
+                owner: {
+                    name: 'Michael Kamau',
+                    phone: '+254 745 678 901',
+                    email: 'michael@movershomes.co.ke',
+                    rating: 4.9,
+                    properties: 12,
+                    responseTime: '30 minutes'
+                },
+                locationDetails: {
+                    nearby: [
+                        { name: 'Business District', distance: '3 min drive' },
+                        { name: 'Luxury Mall', distance: '5 min walk' },
+                        { name: 'Fine Dining', distance: '2 min walk' },
+                        { name: 'Helipad', distance: '8 min drive' }
+                    ],
+                    features: [
+                        'Prime Location',
+                        'Walking Distance to CBD',
+                        'Luxury Amenities',
+                        'Executive Neighborhood',
+                        '24/7 Security',
+                        'Valet Services'
+                    ]
+                },
+                pricing: {
+                    propertyPrice: 'Ksh 85,000,000',
+                    legalFees: 'Ksh 850,000',
+                    stampDuty: 'Ksh 3,400,000',
+                    agentCommission: 'Ksh 1,700,000',
+                    total: 'Ksh 90,950,000'
+                },
+                similarHouses: [1, 2, 3]
+            }
+        };
+
+        // Generate more houses for pagination
+        for (let i = 5; i <= 24; i++) {
+            const baseHouse = houseData[(i % 4) + 1];
+            houseData[i] = {
+                ...baseHouse,
+                title: `${baseHouse.title} ${i}`,
+                price: baseHouse.type === 'For Sale' ? 
+                    `Ksh ${Math.floor(30 + Math.random() * 100)}M` : 
+                    `Ksh ${Math.floor(150 + Math.random() * 350)}K /month`,
+                bedrooms: Math.floor(1 + Math.random() * 5),
+                rating: (4 + Math.random() * 0.9).toFixed(1)
+            };
+        }
+    </script>
+
+    <!-- Main JavaScript - FIXED VERSION -->
+    <script>
+        // Initialize GSAP
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // DOM Elements
+        let housesGrid = null;
+        let loadMoreBtn = null;
+        let currentPage = 1;
+        const housesPerPage = 12;
+        let allHousesLoaded = false;
+        let isInitialLoad = true;
+        
+        // Function to initialize the page
+        function initializePage() {
+            housesGrid = document.getElementById('housesGrid');
+            loadMoreBtn = document.getElementById('loadMoreBtn');
+            
+            if (!housesGrid) {
+                console.error('housesGrid not found!');
+                setTimeout(initializePage, 100); // Retry after 100ms
+                return;
+            }
+            
+            console.log('Page initialized, loading houses...');
+            
+            // Load initial houses
+            loadHouses(currentPage);
+            
+            // Add click events to existing property cards (the 4 nearby houses)
+            document.querySelectorAll('.property-card[data-house-id]').forEach(card => {
+                if (!card.dataset.listenerAdded) {
+                    card.addEventListener('click', function(e) {
+                        // Don't trigger if clicking favorite button
+                        if (!e.target.closest('.favorite-btn')) {
+                            const houseId = this.dataset.houseId;
+                            openHouseModal(houseId);
+                            
+                            // Animate card click
+                            gsap.to(this, {
+                                scale: 0.95,
+                                duration: 0.1,
+                                yoyo: true,
+                                repeat: 1,
+                                ease: "power2.out"
+                            });
+                        }
+                    });
+                    card.dataset.listenerAdded = true;
+                }
+            });
+            
+            // Favorite button functionality for existing cards
+            document.querySelectorAll('.property-card .favorite-btn').forEach(btn => {
+                if (!btn.dataset.listenerAdded) {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const icon = this.querySelector('i');
+                        const isFilled = icon.classList.contains('fas');
+                        
+                        // Animate button click
+                        gsap.to(this, {
+                            scale: 0.9,
+                            duration: 0.1,
+                            yoyo: true,
+                            repeat: 1
+                        });
+                        
+                        // Toggle heart icon
+                        if (isFilled) {
+                            icon.classList.remove('fas');
+                            icon.classList.add('far');
+                            gsap.to(icon, {
+                                color: '#ffffff',
+                                duration: 0.3
+                            });
+                        } else {
+                            icon.classList.remove('far');
+                            icon.classList.add('fas');
+                            gsap.to(icon, {
+                                color: '#ef4444',
+                                duration: 0.3
+                            });
+                            
+                            // Add particle effect
+                            createHeartParticle(this);
+                        }
+                        btn.dataset.listenerAdded = true;
+                    });
+                }
+            });
+            
+            // Filter pill functionality
+            document.querySelectorAll('.filter-pill').forEach(pill => {
+                pill.addEventListener('click', function() {
+                    // Remove active class from all pills
+                    document.querySelectorAll('.filter-pill').forEach(p => {
+                        p.classList.remove('active');
+                        p.classList.remove('bg-gradient-to-r', 'from-teal-500', 'to-blue-500');
+                        p.classList.add('bg-gray-800/50');
+                    });
+                    
+                    // Add active class to clicked pill
+                    this.classList.add('active');
+                    this.classList.remove('bg-gray-800/50');
+                    this.classList.add('bg-gradient-to-r', 'from-teal-500', 'to-blue-500');
+                    
+                    // Animate click
+                    gsap.to(this, {
+                        scale: 0.95,
+                        duration: 0.1,
+                        yoyo: true,
+                        repeat: 1,
+                        ease: "power2.out"
+                    });
+                    
+                    // Filter houses (simulated)
+                    filterHouses(this.textContent);
+                });
+            });
+            
+            // Load More button functionality
+            if (loadMoreBtn) {
+                loadMoreBtn.addEventListener('click', loadMoreHouses);
+            }
+            
+            // Search functionality
+            const searchBtn = document.querySelector('.search-container button');
+            const searchInput = document.querySelector('.search-container input');
+            
+            if (searchBtn) {
+                searchBtn.addEventListener('click', performSearch);
+            }
+            
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        performSearch();
+                    }
+                });
+            }
+            
+            // Sort functionality
+            const sortSelect = document.querySelector('select');
+            if (sortSelect) {
+                sortSelect.addEventListener('change', function() {
+                    sortHouses(this.value);
+                });
+            }
+            
+            // Animate page elements
+            animatePageElements();
+            isInitialLoad = false;
+        }
+        
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', initializePage);
+        
+        // Also try on window load for safety
+        window.addEventListener('load', function() {
+            if (isInitialLoad) {
+                initializePage();
+            }
+        });
+        
+        // Function to load houses
+        function loadHouses(page) {
+            if (!housesGrid) {
+                console.error('housesGrid not available yet');
+                return;
+            }
+            
+            const startIndex = (page - 1) * housesPerPage + 4; // +4 for nearby houses
+            const endIndex = startIndex + housesPerPage;
+            
+            // Clear grid if first page
+            if (page === 1) {
+                housesGrid.innerHTML = '';
+            }
+            
+            // Create loading animation
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'col-span-full py-12';
+            loadingDiv.innerHTML = `
+                <div class="flex justify-center">
+                    <div class="loading-dots flex space-x-2">
+                        <div class="w-3 h-3 rounded-full bg-teal-400 animate-pulse"></div>
+                        <div class="w-3 h-3 rounded-full bg-teal-400 animate-pulse" style="animation-delay: 0.2s"></div>
+                        <div class="w-3 h-3 rounded-full bg-teal-400 animate-pulse" style="animation-delay: 0.4s"></div>
+                    </div>
+                </div>
+                <p class="text-center text-gray-400 mt-4">Loading properties...</p>
+            `;
+            
+            // SAFELY append the loading div
+            try {
+                housesGrid.appendChild(loadingDiv);
+            } catch (error) {
+                console.error('Error appending loading div:', error);
+                return;
+            }
+            
+            // Simulate loading delay
+            setTimeout(() => {
+                // Remove loading animation safely
+                try {
+                    if (housesGrid.contains(loadingDiv)) {
+                        housesGrid.removeChild(loadingDiv);
+                    }
+                } catch (error) {
+                    console.error('Error removing loading div:', error);
+                }
+                
+                // Add houses to grid
+                let addedCount = 0;
+                for (let i = startIndex; i < endIndex && i <= 24; i++) {
+                    const house = houseData[i];
+                    if (house) {
+                        const houseCard = createHouseCard(i, house);
+                        
+                        // SAFELY append house card
+                        try {
+                            housesGrid.appendChild(houseCard);
+                            addedCount++;
+                            
+                            // Add entrance animation
+                            gsap.from(houseCard, {
+                                opacity: 0,
+                                y: 30,
+                                duration: 0.5,
+                                delay: (i - startIndex) * 0.05,
+                                ease: "power2.out"
+                            });
+                            
+                            // Add click event to new card
+                            houseCard.addEventListener('click', function(e) {
+                                // Don't trigger if clicking favorite button
+                                if (!e.target.closest('.favorite-btn')) {
+                                    const houseId = this.dataset.houseId;
+                                    openHouseModal(houseId);
+                                    
+                                    // Animate card click
+                                    gsap.to(this, {
+                                        scale: 0.95,
+                                        duration: 0.1,
+                                        yoyo: true,
+                                        repeat: 1,
+                                        ease: "power2.out"
+                                    });
+                                }
+                            });
+                            
+                            // Add favorite button functionality to new card
+                            const favoriteBtn = houseCard.querySelector('.favorite-btn');
+                            if (favoriteBtn) {
+                                favoriteBtn.addEventListener('click', function(e) {
+                                    e.stopPropagation();
+                                    const icon = this.querySelector('i');
+                                    const isFilled = icon.classList.contains('fas');
+                                    
+                                    // Animate button click
+                                    gsap.to(this, {
+                                        scale: 0.9,
+                                        duration: 0.1,
+                                        yoyo: true,
+                                        repeat: 1
+                                    });
+                                    
+                                    // Toggle heart icon
+                                    if (isFilled) {
+                                        icon.classList.remove('fas');
+                                        icon.classList.add('far');
+                                        gsap.to(icon, {
+                                            color: '#ffffff',
+                                            duration: 0.3
+                                        });
+                                    } else {
+                                        icon.classList.remove('far');
+                                        icon.classList.add('fas');
+                                        gsap.to(icon, {
+                                            color: '#ef4444',
+                                            duration: 0.3
+                                        });
+                                        
+                                        // Add particle effect
+                                        createHeartParticle(this);
+                                    }
+                                });
+                            }
+                        } catch (error) {
+                            console.error('Error appending house card:', error);
+                        }
+                    }
+                }
+                
+                console.log(`Added ${addedCount} houses to the grid`);
+                
+                // Check if all houses loaded
+                if (endIndex >= 24) {
+                    allHousesLoaded = true;
+                    if (loadMoreBtn) {
+                        loadMoreBtn.innerHTML = '<span>All Properties Loaded</span>';
+                        loadMoreBtn.disabled = true;
+                        loadMoreBtn.classList.remove('hover:shadow-blue-500/30', 'hover:shadow-lg');
+                        loadMoreBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    }
+                }
+            }, 800);
+        }
+        
+        // Function to load more houses
+        function loadMoreHouses() {
+            if (!allHousesLoaded) {
+                currentPage++;
+                loadHouses(currentPage);
+                
+                // Animate button click
+                if (loadMoreBtn) {
+                    gsap.to(loadMoreBtn, {
+                        scale: 0.95,
+                        duration: 0.1,
+                        yoyo: true,
+                        repeat: 1,
+                        ease: "power2.out"
+                    });
+                }
+            }
+        }
+        
+        // Function to create house card HTML
+        function createHouseCard(id, house) {
+            const isForSale = house.type === 'For Sale';
+            const badgeColor = isForSale ? 
+                'bg-gradient-to-r from-blue-600 to-teal-500' : 
+                'bg-gradient-to-r from-orange-500 to-red-500';
+            
+            // Create DOM element instead of string
+            const div = document.createElement('div');
+            div.className = 'property-card rounded-2xl overflow-hidden';
+            div.dataset.houseId = id;
+            div.innerHTML = `
+                <div class="relative h-56 overflow-hidden">
+                    <img src="${house.images[0]}" 
+                         alt="${house.title}" 
+                         class="w-full h-full object-cover hover:scale-110 transition-transform duration-500">
+                    <div class="absolute top-4 left-4">
+                        <span class="px-3 py-1 rounded-full ${badgeColor} text-white text-sm font-medium">
+                            ${house.type}
+                        </span>
+                    </div>
+                    <div class="absolute top-4 right-4">
+                        <button class="favorite-btn w-10 h-10 rounded-full bg-black/50 flex items-center justify-center hover:bg-red-500/20 transition-colors duration-300">
+                            <i class="far fa-heart text-white"></i>
+                        </button>
+                    </div>
+                    <div class="absolute bottom-4 left-4">
+                        <div class="price-tag px-3 py-2 rounded-lg">
+                            <div class="text-xl font-bold text-white">${house.price.split(' ')[0]}</div>
+                            <div class="text-gray-300 text-xs">${house.price.includes('/month') ? '/month' : 'KES'}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4">
+                    <h3 class="text-lg font-bold text-white mb-2">${house.title}</h3>
+                    <div class="flex items-center text-gray-400 text-sm mb-3">
+                        <i class="fas fa-map-marker-alt text-teal-400 mr-2"></i>
+                        <span>${house.location}</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <div class="flex items-center">
+                            <i class="fas fa-bed text-blue-400 mr-1"></i>
+                            <span class="text-gray-300 mr-3">${house.bedrooms} Beds</span>
+                            <i class="fas fa-bath text-teal-400 mr-1"></i>
+                            <span class="text-gray-300 mr-3">${house.bathrooms} Baths</span>
+                            <i class="fas fa-ruler-combined text-orange-400 mr-1"></i>
+                            <span class="text-gray-300">${house.sqft} sq ft</span>
+                        </div>
+                        <div class="flex items-center text-amber-400">
+                            <i class="fas fa-star"></i>
+                            <span class="ml-1">${house.rating}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return div;
+        }
+        
+        // Function to open house modal
+        function openHouseModal(houseId) {
+            const house = houseData[houseId];
+            if (!house) return;
+            
+            // Check if modal already exists
+            const existingModal = document.querySelector('.property-modal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Create modal HTML
+            const modalHTML = `
+                <div class="property-modal active">
+                    <div class="modal-content">
+                        <div class="modal-close">
+                            <i class="fas fa-times"></i>
+                        </div>
+                        
+                        <div class="modal-header p-8 border-b border-gray-800">
+                            <h2 class="text-3xl font-bold text-white mb-4">${house.title}</h2>
+                            <div class="flex items-center gap-4">
+                                <div class="text-teal-400">
+                                    <i class="fas fa-map-marker-alt mr-2"></i>
+                                    ${house.location}
+                                </div>
+                                <div class="flex items-center text-amber-400">
+                                    <i class="fas fa-star"></i>
+                                    <span class="ml-1 font-medium">${house.rating}</span>
+                                </div>
+                                <span class="px-3 py-1 rounded-full ${house.type === 'For Sale' ? 'bg-gradient-to-r from-blue-600 to-teal-500' : 'bg-gradient-to-r from-orange-500 to-red-500'} text-white text-sm font-medium">
+                                    ${house.type}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="modal-body p-8">
+                            <!-- House Image Gallery -->
+                            <div class="mb-8">
+                                <h3 class="text-xl font-bold text-white mb-4">Image Gallery</h3>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    ${house.images.map((img, index) => `
+                                        <div class="rounded-xl overflow-hidden h-32 cursor-pointer hover:opacity-90 transition-opacity duration-300">
+                                            <img src="${img}" alt="${house.title} - View ${index + 1}" class="w-full h-full object-cover">
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            
+                            <!-- House Description -->
+                            <div class="mb-8">
+                                <h3 class="text-xl font-bold text-white mb-4">Description</h3>
+                                <p class="text-gray-300 leading-relaxed">${house.description}</p>
+                            </div>
+                            
+                            <!-- Pricing & Property Details -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                                <div>
+                                    <h3 class="text-xl font-bold text-white mb-4">Pricing Details</h3>
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between items-center p-3 rounded-lg bg-gray-800/30">
+                                            <span class="text-gray-300">Price</span>
+                                            <span class="text-2xl font-bold text-white">${house.price}</span>
+                                        </div>
+                                        ${house.type === 'For Sale' ? `
+                                            <div class="flex justify-between items-center p-3 rounded-lg bg-gray-800/30">
+                                                <span class="text-gray-300">Price per sq ft</span>
+                                                <span class="text-white font-medium">Ksh ${Math.round(parseInt(house.price.replace(/[^0-9]/g, '')) / house.sqft).toLocaleString()}</span>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <h3 class="text-xl font-bold text-white mb-4">Property Details</h3>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div class="p-3 rounded-lg bg-gray-800/30 text-center">
+                                            <div class="text-2xl font-bold text-white">${house.bedrooms}</div>
+                                            <div class="text-gray-400 text-sm">Bedrooms</div>
+                                        </div>
+                                        <div class="p-3 rounded-lg bg-gray-800/30 text-center">
+                                            <div class="text-2xl font-bold text-white">${house.bathrooms}</div>
+                                            <div class="text-gray-400 text-sm">Bathrooms</div>
+                                        </div>
+                                        <div class="p-3 rounded-lg bg-gray-800/30 text-center">
+                                            <div class="text-2xl font-bold text-white">${house.sqft.toLocaleString()}</div>
+                                            <div class="text-gray-400 text-sm">Square Feet</div>
+                                        </div>
+                                        <div class="p-3 rounded-lg bg-gray-800/30 text-center">
+                                            <div class="text-2xl font-bold text-white">${house.yearBuilt}</div>
+                                            <div class="text-gray-400 text-sm">Year Built</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Location & Surroundings -->
+                            <div class="mb-8">
+                                <h3 class="text-xl font-bold text-white mb-4">Location & Surroundings</h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    ${house.locationDetails.nearby.map(item => `
+                                        <div class="flex items-center justify-between p-3 rounded-lg bg-gray-800/30">
+                                            <div class="flex items-center">
+                                                <i class="fas fa-location-arrow text-teal-400 mr-3"></i>
+                                                <span class="text-gray-300">${item.name}</span>
+                                            </div>
+                                            <span class="text-white font-medium">${item.distance}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            
+                            <!-- House Owner Summary -->
+                            <div class="mb-8">
+                                <h3 class="text-xl font-bold text-white mb-4">House Owner</h3>
+                                <div class="flex items-center p-4 rounded-xl bg-gray-800/30">
+                                    <div class="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-teal-400 flex items-center justify-center mr-4">
+                                        <i class="fas fa-user-tie text-white text-xl"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="text-lg font-bold text-white">${house.owner.name}</h4>
+                                        <p class="text-gray-400">Verified Property Owner</p>
+                                        <div class="flex items-center mt-2">
+                                            <div class="flex items-center text-amber-400 mr-4">
+                                                <i class="fas fa-star"></i>
+                                                <span class="ml-1">${house.owner.rating}</span>
+                                            </div>
+                                            <div class="text-gray-400 text-sm">
+                                                <i class="fas fa-clock mr-1"></i>
+                                                Response: ${house.owner.responseTime}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="space-x-3">
+                                        <button class="chat-owner-btn px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-teal-500 text-white hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300">
+                                            <i class="fas fa-comments mr-2"></i>Chat
+                                        </button>
+                                        <button class="call-owner-btn px-4 py-2 rounded-lg bg-gray-800/50 text-gray-300 hover:text-white hover:bg-gray-700/50 transition-colors duration-300">
+                                            <i class="fas fa-phone-alt mr-2"></i>Call
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Request Moving Service -->
+                            <div class="mb-8">
+                                <h3 class="text-xl font-bold text-white mb-4">Moving Services</h3>
+                                <div class="p-4 rounded-xl bg-gradient-to-r from-orange-900/20 to-red-900/20 border border-orange-500/30">
+                                    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                                        <div>
+                                            <h4 class="text-lg font-bold text-white mb-1">Need help moving?</h4>
+                                            <p class="text-gray-300">Book professional moving services with our trusted partners</p>
+                                        </div>
+                                        <button class="request-moving-btn px-6 py-3 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold hover:shadow-lg hover:shadow-orange-500/30 transition-all duration-300">
+                                            <i class="fas fa-truck-moving mr-2"></i>Request Moving Service
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Related / Similar Houses -->
+                            <div>
+                                <h3 class="text-xl font-bold text-white mb-4">Similar Properties</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    ${house.similarHouses.map(similarId => {
+                                        const similarHouse = houseData[similarId];
+                                        if (!similarHouse) return '';
+                                        return `
+                                            <div class="p-3 rounded-lg bg-gray-800/30 hover:bg-gray-700/30 transition-colors duration-300 cursor-pointer" onclick="openHouseModal(${similarId})">
+                                                <div class="flex items-center">
+                                                    <img src="${similarHouse.images[0]}" 
+                                                         alt="${similarHouse.title}" 
+                                                         class="w-16 h-16 rounded-lg object-cover mr-3">
+                                                    <div>
+                                                        <h4 class="text-white font-medium">${similarHouse.title}</h4>
+                                                        <p class="text-gray-400 text-sm">${similarHouse.location}</p>
+                                                        <p class="text-teal-400 text-sm font-medium">${similarHouse.price}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="modal-footer p-6 border-t border-gray-800 bg-gray-900/50 rounded-b-2xl">
+                            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                                <div class="text-gray-400 text-sm">
+                                    <i class="fas fa-eye mr-1"></i>
+                                    2,845 views • 
+                                    <i class="fas fa-heart ml-3 mr-1"></i>
+                                    18 saves
+                                </div>
+                                <div class="flex gap-3">
+                                    <button class="save-property-btn px-6 py-3 rounded-lg bg-gray-800/50 text-gray-300 hover:text-white hover:bg-gray-700/50 transition-colors duration-300">
+                                        <i class="far fa-heart mr-2"></i>Save
+                                    </button>
+                                    <button class="schedule-viewing-btn px-6 py-3 rounded-lg bg-gradient-to-r from-blue-600 to-teal-500 text-white font-semibold hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300">
+                                        <i class="fas fa-calendar-check mr-2"></i>Schedule Viewing
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add modal to body
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Prevent body scroll when modal is open
+            document.body.style.overflow = 'hidden';
+            
+            // Add event listeners for modal
+            const modal = document.querySelector('.property-modal');
+            const closeBtn = modal.querySelector('.modal-close');
+            
+            // Close modal on X click
+            closeBtn.addEventListener('click', () => closeHouseModal(modal));
+            
+            // Close modal on outside click
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeHouseModal(modal);
+                }
+            });
+            
+            // Close on Escape key
+            const escapeHandler = function(e) {
+                if (e.key === 'Escape' && modal.classList.contains('active')) {
+                    closeHouseModal(modal);
+                    document.removeEventListener('keydown', escapeHandler);
+                }
+            };
+            document.addEventListener('keydown', escapeHandler);
+            
+            // Action button handlers
+            const chatBtn = modal.querySelector('.chat-owner-btn');
+            const callBtn = modal.querySelector('.call-owner-btn');
+            const movingBtn = modal.querySelector('.request-moving-btn');
+            const saveBtn = modal.querySelector('.save-property-btn');
+            const scheduleBtn = modal.querySelector('.schedule-viewing-btn');
+            
+            if (chatBtn) {
+                chatBtn.addEventListener('click', () => {
+                    showNotification('Opening chat with ' + house.owner.name, 'info');
+                });
+            }
+            
+            if (callBtn) {
+                callBtn.addEventListener('click', () => {
+                    window.location.href = `tel:${house.owner.phone.replace(/\s+/g, '')}`;
+                });
+            }
+            
+            if (movingBtn) {
+                movingBtn.addEventListener('click', () => {
+                    showNotification('Redirecting to moving services...', 'info');
+                });
+            }
+            
+            if (saveBtn) {
+                saveBtn.addEventListener('click', function() {
+                    const icon = this.querySelector('i');
+                    if (icon.classList.contains('far')) {
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
+                        this.style.color = '#ef4444';
+                        showNotification('Property saved to favorites!', 'success');
+                    } else {
+                        icon.classList.remove('fas');
+                        icon.classList.add('far');
+                        this.style.color = '';
+                        showNotification('Property removed from favorites', 'info');
+                    }
+                });
+            }
+            
+            if (scheduleBtn) {
+                scheduleBtn.addEventListener('click', () => {
+                    showScheduleModal(house);
+                });
+            }
+            
+            // Animate modal entrance
+            gsap.from(modal.querySelector('.modal-content'), {
+                scale: 0.8,
+                opacity: 0,
+                duration: 0.5,
+                ease: "back.out(1.7)"
+            });
+        }
+        
+        // Function to close house modal
+        function closeHouseModal(modal) {
+            if (!modal) return;
+            
+            gsap.to(modal.querySelector('.modal-content'), {
+                scale: 0.8,
+                opacity: 0,
+                duration: 0.3,
+                ease: "power2.in",
+                onComplete: () => {
+                    modal.classList.remove('active');
+                    setTimeout(() => {
+                        if (modal.parentNode) {
+                            modal.remove();
+                        }
+                        document.body.style.overflow = '';
+                    }, 300);
+                }
+            });
+            
+            gsap.to(modal, {
+                opacity: 0,
+                duration: 0.3
+            });
+        }
+        
+        // Function to show schedule modal
+        function showScheduleModal(house) {
+            const scheduleModalHTML = `
+                <div class="property-modal active">
+                    <div class="modal-content" style="max-width: 500px;">
+                        <div class="modal-close">
+                            <i class="fas fa-times"></i>
+                        </div>
+                        
+                        <div class="modal-header p-6 border-b border-gray-800">
+                            <h2 class="text-2xl font-bold text-white">Schedule Viewing</h2>
+                            <p class="text-gray-400 text-sm mt-1">${house.title}</p>
+                        </div>
+                        
+                        <div class="modal-body p-6">
+                            <form id="scheduleForm" class="space-y-4">
+                                <div>
+                                    <label class="block text-gray-300 mb-2">Full Name</label>
+                                    <input type="text" required
+                                           class="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-700/50 text-white focus:outline-none focus:border-teal-500 transition-colors duration-300">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-300 mb-2">Phone Number</label>
+                                    <input type="tel" required
+                                           class="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-700/50 text-white focus:outline-none focus:border-teal-500 transition-colors duration-300"
+                                           placeholder="+254 700 000 000">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-300 mb-2">Preferred Date</label>
+                                    <input type="date" required
+                                           class="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-700/50 text-white focus:outline-none focus:border-teal-500 transition-colors duration-300">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-gray-300 mb-2">Preferred Time</label>
+                                    <select class="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-700/50 text-white focus:outline-none focus:border-teal-500 transition-colors duration-300">
+                                        <option>Morning (9 AM - 12 PM)</option>
+                                        <option>Afternoon (1 PM - 4 PM)</option>
+                                        <option>Evening (5 PM - 7 PM)</option>
+                                    </select>
+                                </div>
+                                
+                                <button type="submit" 
+                                        class="w-full py-3 rounded-lg bg-gradient-to-r from-blue-600 to-teal-500 text-white font-semibold hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300">
+                                    Schedule Viewing
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', scheduleModalHTML);
+            
+            const modal = document.querySelector('.property-modal:last-child');
+            const closeBtn = modal.querySelector('.modal-close');
+            const form = modal.querySelector('#scheduleForm');
+            
+            closeBtn.addEventListener('click', () => closeHouseModal(modal));
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeHouseModal(modal);
+            });
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Scheduling...';
+                submitBtn.disabled = true;
+                
+                setTimeout(() => {
+                    submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Scheduled!';
+                    submitBtn.classList.remove('bg-gradient-to-r', 'from-blue-600', 'to-teal-500');
+                    submitBtn.classList.add('bg-gradient-to-r', 'from-green-600', 'to-teal-500');
+                    
+                    setTimeout(() => {
+                        closeHouseModal(modal);
+                        showNotification('Viewing scheduled successfully! The owner will contact you soon.', 'success');
+                    }, 1500);
+                }, 2000);
+            });
+        }
+        
+        // Helper function to create heart particle effect
+        function createHeartParticle(button) {
+            const particle = document.createElement('div');
+            particle.innerHTML = '<i class="fas fa-heart"></i>';
+            particle.style.position = 'absolute';
+            particle.style.color = '#ef4444';
+            particle.style.fontSize = '20px';
+            particle.style.pointerEvents = 'none';
+            particle.style.zIndex = '1000';
+            
+            const rect = button.getBoundingClientRect();
+            particle.style.left = `${rect.left + rect.width / 2}px`;
+            particle.style.top = `${rect.top + rect.height / 2}px`;
+            
+            document.body.appendChild(particle);
+            
+            gsap.to(particle, {
+                y: -100,
+                x: (Math.random() - 0.5) * 100,
+                opacity: 0,
+                scale: 0.5,
+                duration: 1,
+                ease: "power2.out",
+                onComplete: () => {
+                    if (particle.parentNode) {
+                        document.body.removeChild(particle);
+                    }
+                }
+            });
+        }
+        
+        // Helper function to show notifications
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 px-6 py-3 rounded-xl backdrop-blur-sm border z-[10000] transition-all duration-300 transform translate-x-full ${type === 'success' ? 'bg-green-900/30 border-green-500/30 text-green-300' : 'bg-blue-900/30 border-blue-500/30 text-blue-300'}`;
+            notification.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i>
+                    <span class="text-sm">${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            gsap.to(notification, {
+                x: 0,
+                duration: 0.5,
+                ease: "back.out(1.7)"
+            });
+            
+            setTimeout(() => {
+                gsap.to(notification, {
+                    x: 500,
+                    opacity: 0,
+                    duration: 0.3,
+                    onComplete: () => {
+                        if (notification.parentNode) {
+                            notification.remove();
+                        }
+                    }
+                });
+            }, 3000);
+        }
+        
+        // Filter houses function
+        function filterHouses(filter) {
+            // Simulate filtering
+            showNotification(`Filtering by: ${filter}`, 'info');
+            
+            // In a real app, this would filter the houseData and re-render
+            document.querySelectorAll('.property-card').forEach(card => {
+                gsap.to(card, {
+                    opacity: 0.3,
+                    duration: 0.3,
+                    ease: "power2.out"
+                });
+            });
+            
+            setTimeout(() => {
+                document.querySelectorAll('.property-card').forEach(card => {
+                    gsap.to(card, {
+                        opacity: 1,
+                        duration: 0.3,
+                        ease: "power2.out"
+                    });
+                });
+            }, 500);
+        }
+        
+        // Sort houses function
+        function sortHouses(sortBy) {
+            // Simulate sorting
+            showNotification(`Sorting by: ${sortBy}`, 'info');
+        }
+        
+        // Perform search function
+        function performSearch() {
+            const searchInput = document.querySelector('.search-container input');
+            const searchTerm = searchInput.value.trim();
+            
+            if (searchTerm) {
+                showNotification(`Searching for: ${searchTerm}`, 'info');
+                // In a real app, this would filter houses based on search term
+            }
+        }
+        
+        // Animate page elements on load
+        function animatePageElements() {
+            // Animate search section
+            gsap.from('.search-container', {
+                y: 30,
+                opacity: 0,
+                duration: 0.8,
+                delay: 0.3,
+                ease: "power2.out"
+            });
+            
+            // Animate nearby houses
+            gsap.from('.property-card', {
+                y: 30,
+                opacity: 0,
+                duration: 0.6,
+                stagger: 0.1,
+                delay: 0.5,
+                ease: "power2.out"
+            });
+            
+            // Animate section headers
+            gsap.from('h2', {
+                y: 20,
+                opacity: 0,
+                duration: 0.6,
+                stagger: 0.2,
+                ease: "power2.out"
+            });
+        }
+        
+        // Make openHouseModal globally available for similar houses
+        window.openHouseModal = openHouseModal;
+    </script>
+</body>
+</html>

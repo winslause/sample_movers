@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post/Edit House | Movers & Homes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        :root {
+            --primary-blue: #0a2463;
+            --secondary-blue: #3e78b2;
+            --accent-orange: #ff6b35;
+            --accent-teal: #4ecdc4;
+            --dark-gray: #0f172a;
+            --card-bg: #1e293b;
+            --success-green: #10b981;
+            --pending-orange: #f59e0b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-gray);
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        
+        /* Glass Navigation */
+        .glass-nav {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Main Container */
+        .post-container {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Form Sections */
+        .form-section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-section:hover {
+            border-color: rgba(78, 205, 196, 0.3);
+            background: rgba(78, 205, 196, 0.02);
+        }
+        
+        .form-section.active {
+            border-color: var(--accent-teal);
+            background: rgba(78, 205, 196, 0.05);
+        }
+        
+        /* Form Inputs */
+        .form-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-teal);
+            box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        /* Upload Zone */
+        .upload-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .upload-zone:hover {
+            border-color: var(--accent-teal);
+            background: rgba(78, 205, 196, 0.05);
+        }
+        
+        .upload-zone.dragover {
+            border-color: var(--accent-teal);
+            background: rgba(78, 205, 196, 0.1);
+            transform: scale(1.02);
+        }
+        
+        /* Image Preview */
+        .image-preview {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .image-preview:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .image-preview .remove-btn {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .image-preview:hover .remove-btn {
+            opacity: 1;
+        }
+        
+        /* Toggle Switch */
+        .toggle-switch {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-switch.active {
+            background: var(--accent-teal);
+        }
+        
+        .toggle-knob {
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-switch.active .toggle-knob {
+            transform: translateX(20px);
+        }
+        
+        /* Step Progress */
+        .step-progress {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+        
+        .step-progress::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 1;
+        }
+        
+        .step {
+            position: relative;
+            z-index: 2;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active {
+            background: var(--accent-teal);
+            color: white;
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.5);
+        }
+        
+        .step.completed {
+            background: var(--success-green);
+            color: white;
+        }
+        
+        /* Status Badges */
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .status-pending {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        
+        .status-approved {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        .status-rejected {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        /* Feature Tags */
+        .feature-tag {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .feature-tag:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .feature-tag.selected {
+            background: rgba(78, 205, 196, 0.2);
+            border-color: var(--accent-teal);
+            color: var(--accent-teal);
+        }
+        
+        /* Preview Card */
+        .preview-card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .preview-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .step-progress::before {
+                display: none;
+            }
+            
+            .step-progress {
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            .step {
+                width: 35px;
+                height: 35px;
+                font-size: 14px;
+            }
+        }
+        
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.5s ease forwards;
+        }
+        
+        /* Success Animation */
+        @keyframes successPulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 20px rgba(16, 185, 129, 0);
+            }
+        }
+        
+        .success-pulse {
+            animation: successPulse 2s infinite;
+        }
+        
+        /* Gradient Text */
+        .gradient-text {
+            background: linear-gradient(135deg, #ffffff 0%, #93c5fd 50%, #4ecdc4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Required Field Indicator */
+        .required::after {
+            content: ' *';
+            color: #ef4444;
+        }
+        
+        /* Form Validation */
+        .error-input {
+            border-color: #ef4444 !important;
+            background: rgba(239, 68, 68, 0.05) !important;
+        }
+        
+        .success-input {
+            border-color: #10b981 !important;
+            background: rgba(16, 185, 129, 0.05) !important;
+        }
+        
+        /* Map Container */
+        .map-container {
+            height: 300px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+        
+        .map-placeholder {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-900">
+    <!-- Navigation -->
+    <nav class="glass-nav fixed top-0 left-0 right-0 z-50 py-4">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <a href="index.html" class="flex items-center space-x-3">
+                        <div class="relative">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-teal-400 flex items-center justify-center shadow-lg">
+                                <i class="fas fa-home text-white text-xl"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h1 class="logo-text text-2xl font-bold tracking-tight">Movers<span class="text-white">&</span>Homes</h1>
+                            <p class="text-gray-400 text-xs">Seamless Relocation Experience</p>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Navigation Menu -->
+                <div class="hidden lg:flex items-center space-x-6">
+                    <a href="index.html" class="text-gray-300 hover:text-white transition-colors duration-300">
+                        Home
+                    </a>
+                    <a href="houses.html" class="text-gray-300 hover:text-white transition-colors duration-300">
+                        Houses
+                    </a>
+                    <a href="movers.html" class="text-gray-300 hover:text-white transition-colors duration-300">
+                        Moving Services
+                    </a>
+                    <a href="profile.html" class="text-gray-300 hover:text-white transition-colors duration-300">
+                        My Profile
+                    </a>
+                </div>
+
+                <!-- User Actions -->
+                <div class="flex items-center space-x-3">
+                    <a href="profile.html" class="px-4 py-2 rounded-lg bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors duration-300">
+                        <i class="fas fa-user mr-2"></i>wens254
+                    </a>
+                    <button id="logoutBtn" class="px-4 py-2 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 text-white hover:shadow-lg hover:shadow-orange-500/30 transition-all duration-300">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="pt-28 pb-12 px-4">
+        <div class="container mx-auto max-w-6xl">
+            <!-- Page Header -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4 gradient-text">
+                    <i class="fas fa-home mr-3"></i>Post Your Property
+                </h1>
+                <p class="text-gray-400 text-lg max-w-2xl mx-auto">
+                    List your house for sale or rent. Fill in the details below to reach thousands of potential buyers or tenants.
+                </p>
+            </div>
+
+            <!-- Step Progress Indicator -->
+            <div class="mb-8">
+                <div class="step-progress mb-4">
+                    <div class="step active" data-step="1">
+                        <span>1</span>
+                        <div class="absolute -bottom-8 text-xs text-center w-32">
+                            <div class="font-medium text-white">Basic Info</div>
+                            <div class="text-gray-400 text-[10px]">Title, price & type</div>
+                        </div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <span>2</span>
+                        <div class="absolute -bottom-8 text-xs text-center w-32">
+                            <div class="font-medium text-gray-400">Location</div>
+                            <div class="text-gray-400 text-[10px]">Address & map</div>
+                        </div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <span>3</span>
+                        <div class="absolute -bottom-8 text-xs text-center w-32">
+                            <div class="font-medium text-gray-400">Details</div>
+                            <div class="text-gray-400 text-[10px]">Features & amenities</div>
+                        </div>
+                    </div>
+                    <div class="step" data-step="4">
+                        <span>4</span>
+                        <div class="absolute -bottom-8 text-xs text-center w-32">
+                            <div class="font-medium text-gray-400">Media</div>
+                            <div class="text-gray-400 text-[10px]">Photos & videos</div>
+                        </div>
+                    </div>
+                    <div class="step" data-step="5">
+                        <span>5</span>
+                        <div class="absolute -bottom-8 text-xs text-center w-32">
+                            <div class="font-medium text-gray-400">Review</div>
+                            <div class="text-gray-400 text-[10px]">Preview & submit</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Form Container -->
+            <div class="post-container p-6 md:p-8">
+                <form id="houseForm" class="space-y-8">
+                    <!-- Step 1: Basic Information -->
+                    <div class="form-section p-6 active" id="step1">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h2 class="text-2xl font-bold text-white flex items-center">
+                                    <span class="w-8 h-8 rounded-lg bg-teal-500/20 border border-teal-500/30 flex items-center justify-center mr-3">
+                                        <i class="fas fa-info-circle text-teal-400"></i>
+                                    </span>
+                                    Basic Information
+                                </h2>
+                                <p class="text-gray-400 mt-1">Provide essential details about your property</p>
+                            </div>
+                            <span class="text-xs px-3 py-1 rounded-full bg-teal-500/20 text-teal-400 border border-teal-500/30">
+                                Required
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Property Title -->
+                            <div class="col-span-2">
+                                <label class="block text-white font-medium mb-2 required">Property Title</label>
+                                <input type="text" 
+                                       id="propertyTitle"
+                                       required
+                                       placeholder="e.g., Modern 3-Bedroom Apartment with Balcony"
+                                       class="form-input w-full px-4 py-3 rounded-xl">
+                                <p class="text-gray-400 text-sm mt-1">Make it attractive and descriptive</p>
+                            </div>
+
+                            <!-- Property Type -->
+                            <div>
+                                <label class="block text-white font-medium mb-2 required">Property Type</label>
+                                <select id="propertyType" class="form-input w-full px-4 py-3 rounded-xl" required>
+                                    <option value="">Select Property Type</option>
+                                    <option value="apartment">Apartment</option>
+                                    <option value="house">Detached House</option>
+                                    <option value="townhouse">Townhouse</option>
+                                    <option value="villa">Villa</option>
+                                    <option value="bungalow">Bungalow</option>
+                                    <option value="penthouse">Penthouse</option>
+                                    <option value="duplex">Duplex</option>
+                                    <option value="studio">Studio</option>
+                                </select>
+                            </div>
+
+                            <!-- Listing Type -->
+                            <div>
+                                <label class="block text-white font-medium mb-2 required">Listing Type</label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="listingType" value="sale" class="hidden" required>
+                                        <div class="p-4 rounded-xl bg-gray-800/50 border-2 border-gray-700 hover:border-teal-500 transition-colors duration-300 text-center">
+                                            <i class="fas fa-tag text-2xl mb-2 text-gray-400"></i>
+                                            <div class="font-medium">For Sale</div>
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="listingType" value="rent" class="hidden" required>
+                                        <div class="p-4 rounded-xl bg-gray-800/50 border-2 border-gray-700 hover:border-teal-500 transition-colors duration-300 text-center">
+                                            <i class="fas fa-calendar-alt text-2xl mb-2 text-gray-400"></i>
+                                            <div class="font-medium">For Rent</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Price -->
+                            <div>
+                                <label class="block text-white font-medium mb-2 required">
+                                    <span id="priceLabel">Price (KES)</span>
+                                </label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">Ksh</span>
+                                    <input type="number" 
+                                           id="price"
+                                           required
+                                           min="0"
+                                           placeholder="0"
+                                           class="form-input w-full pl-14 pr-4 py-3 rounded-xl">
+                                </div>
+                                <p class="text-gray-400 text-sm mt-1" id="priceDescription">Total price for sale</p>
+                            </div>
+
+                            <!-- Price Period (for rent) -->
+                            <div id="pricePeriodContainer" class="hidden">
+                                <label class="block text-white font-medium mb-2">Rental Period</label>
+                                <select id="pricePeriod" class="form-input w-full px-4 py-3 rounded-xl">
+                                    <option value="month">Per Month</option>
+                                    <option value="year">Per Year</option>
+                                    <option value="week">Per Week</option>
+                                    <option value="day">Per Day</option>
+                                </select>
+                            </div>
+
+                            <!-- Property Status -->
+                            <div class="col-span-2">
+                                <label class="block text-white font-medium mb-2">Property Status</label>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="propertyStatus" value="new" class="hidden">
+                                        <div class="p-4 rounded-xl bg-gray-800/50 border-2 border-gray-700 hover:border-blue-500 transition-colors duration-300 text-center">
+                                            <i class="fas fa-star text-2xl mb-2 text-blue-400"></i>
+                                            <div class="font-medium">New</div>
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="propertyStatus" value="used" class="hidden">
+                                        <div class="p-4 rounded-xl bg-gray-800/50 border-2 border-gray-700 hover:border-orange-500 transition-colors duration-300 text-center">
+                                            <i class="fas fa-home text-2xl mb-2 text-orange-400"></i>
+                                            <div class="font-medium">Used</div>
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="propertyStatus" value="renovated" class="hidden">
+                                        <div class="p-4 rounded-xl bg-gray-800/50 border-2 border-gray-700 hover:border-green-500 transition-colors duration-300 text-center">
+                                            <i class="fas fa-paint-roller text-2xl mb-2 text-green-400"></i>
+                                            <div class="font-medium">Renovated</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step Navigation -->
+                        <div class="flex justify-end mt-8 pt-6 border-t border-gray-800">
+                            <button type="button" onclick="nextStep(2)" class="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-teal-500 text-white font-semibold hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300">
+                                Next: Location Details <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Location Details -->
+                    <div class="form-section p-6" id="step2" style="display: none;">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h2 class="text-2xl font-bold text-white flex items-center">
+                                    <span class="w-8 h-8 rounded-lg bg-blue-500/20 border border-blue-500/30 flex items-center justify-center mr-3">
+                                        <i class="fas fa-map-marker-alt text-blue-400"></i>
+                                    </span>
+                                    Location Details
+                                </h2>
+                                <p class="text-gray-400 mt-1">Where is your property located?</p>
+                            </div>
+                            <span class="text-xs px-3 py-1 rounded-full bg-teal-500/20 text-teal-400 border border-teal-500/30">
+                                Required
+                            </span>
+                        </div>
+
+                        <div class="space-y-6">
+                            <!-- Country & City -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-white font-medium mb-2 required">Country</label>
+                                    <select id="country" class="form-input w-full px-4 py-3 rounded-xl" required>
+                                        <option value="">Select Country</option>
+                                        <option value="kenya" selected>Kenya</option>
+                                        <option value="uganda">Uganda</option>
+                                        <option value="tanzania">Tanzania</option>
+                                        <option value="rwanda">Rwanda</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-white font-medium mb-2 required">City/Town</label>
+                                    <select id="city" class="form-input w-full px-4 py-3 rounded-xl" required>
+                                        <option value="">Select City</option>
+                                        <option value="nairobi">Nairobi</option>
+                                        <option value="mombasa">Mombasa</option>
+                                        <option value="kisumu">Kisumu</option>
+                                        <option value="nakuru">Nakuru</option>
+                                        <option value="eldoret">Eldoret</option>
+                                        <option value="thika">Thika</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Neighborhood -->
+                            <div>
+                                <label class="block text-white font-medium mb-2 required">Neighborhood/Area</label>
+                                <input type="text" 
+                                       id="neighborhood"
+                                       required
+                                       placeholder="e.g., Westlands, Kilimani, Karen"
+                                       class="form-input w-full px-4 py-3 rounded-xl">
+                            </div>
+
+                            <!-- Full Address -->
+                            <div>
+                                <label class="block text-white font-medium mb-2">Full Address</label>
+                                <textarea id="fullAddress" 
+                                          rows="2"
+                                          placeholder="Building name, street, apartment number, etc."
+                                          class="form-input w-full px-4 py-3 rounded-xl"></textarea>
+                                <p class="text-gray-400 text-sm mt-1">This will be shared with verified users only</p>
+                            </div>
+
+                            <!-- Map Location -->
+                            <div>
+                                <label class="block text-white font-medium mb-2">Map Location</label>
+                                <div class="map-container">
+                                    <div class="map-placeholder">
+                                        <div class="text-center">
+                                            <i class="fas fa-map text-4xl text-gray-600 mb-3"></i>
+                                            <p class="text-gray-400">Click to set property location on map</p>
+                                            <button type="button" class="mt-4 px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-white transition-colors duration-300">
+                                                <i class="fas fa-map-marker-alt mr-2"></i>Set Location
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Landmarks -->
+                            <div>
+                                <label class="block text-white font-medium mb-2">Nearby Landmarks</label>
+                                <div class="space-y-3">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <input type="text" 
+                                               placeholder="e.g., 5 min to Mall"
+                                               class="form-input px-4 py-3 rounded-xl">
+                                        <input type="text" 
+                                               placeholder="e.g., 10 min to School"
+                                               class="form-input px-4 py-3 rounded-xl">
+                                    </div>
+                                    <button type="button" class="text-sm text-teal-400 hover:text-teal-300 transition-colors duration-300">
+                                        <i class="fas fa-plus mr-1"></i> Add another landmark
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step Navigation -->
+                        <div class="flex justify-between mt-8 pt-6 border-t border-gray-800">
+                            <button type="button" onclick="previousStep(1)" class="px-6 py-3 rounded-xl bg-gray-800/50 text-gray-300 hover:text-white hover:bg-gray-700/50 transition-colors duration-300">
+                                <i class="fas fa-arrow-left mr-2"></i> Previous
+                            </button>
+                            <button type="button" onclick="nextStep(3)" class="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-teal-500 text-white font-semibold hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300">
+                                Next: Property Details <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Property Details -->
+                    <div class="form-section p-6" id="step3" style="display: none;">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h2 class="text-2xl font-bold text-white flex items-center">
+                                    <span class="w-8 h-8 rounded-lg bg-purple-500/20 border border-purple-500/30 flex items-center justify-center mr-3">
+                                        <i class="fas fa-ruler-combined text-purple-400"></i>
+                                    </span>
+                                    Property Details
+                                </h2>
+                                <p class="text-gray-400 mt-1">Describe your property features and amenities</p>
+                            </div>
+                            <span class="text-xs px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                                Optional
+                            </span>
+                        </div>
+
+                        <div class="space-y-6">
+                            <!-- Basic Details -->
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div>
+                                    <label class="block text-white font-medium mb-2">Bedrooms</label>
+                                    <select class="form-input w-full px-4 py-3 rounded-xl">
+                                        <option value="">Any</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5+">5+</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-white font-medium mb-2">Bathrooms</label>
+                                    <select class="form-input w-full px-4 py-3 rounded-xl">
+                                        <option value="">Any</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4+">4+</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-white font-medium mb-2">Square Feet</label>
+                                    <input type="number" 
+                                           placeholder="0"
+                                           class="form-input w-full px-4 py-3 rounded-xl">
+                                </div>
+                                <div>
+                                    <label class="block text-white font-medium mb-2">Parking Spaces</label>
+                                    <select class="form-input w-full px-4 py-3 rounded-xl">
+                                        <option value="">Any</option>
+                                        <option value="0">0</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3+">3+</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Year Built & Floors -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-white font-medium mb-2">Year Built</label>
+                                    <input type="number" 
+                                           min="1900"
+                                           max="2024"
+                                           placeholder="e.g., 2020"
+                                           class="form-input w-full px-4 py-3 rounded-xl">
+                                </div>
+                                <div>
+                                    <label class="block text-white font-medium mb-2">Floors/Stories</label>
+                                    <select class="form-input w-full px-4 py-3 rounded-xl">
+                                        <option value="">Select</option>
+                                        <option value="1">1 Floor</option>
+                                        <option value="2">2 Floors</option>
+                                        <option value="3">3 Floors</option>
+                                        <option value="4+">4+ Floors</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Description -->
+                            <div>
+                                <label class="block text-white font-medium mb-2">Property Description</label>
+                                <textarea rows="4"
+                                          placeholder="Describe your property in detail. Include unique features, condition, recent renovations, etc."
+                                          class="form-input w-full px-4 py-3 rounded-xl"></textarea>
+                                <p class="text-gray-400 text-sm mt-1">Detailed descriptions attract more serious buyers/tenants</p>
+                            </div>
+
+                            <!-- Features -->
+                            <div>
+                                <label class="block text-white font-medium mb-2">Property Features</label>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                    <div class="feature-tag" data-feature="swimming-pool">
+                                        <i class="fas fa-swimming-pool mr-2"></i> Swimming Pool
+                                    </div>
+                                    <div class="feature-tag" data-feature="garden">
+                                        <i class="fas fa-tree mr-2"></i> Garden
+                                    </div>
+                                    <div class="feature-tag" data-feature="security">
+                                        <i class="fas fa-shield-alt mr-2"></i> Security
+                                    </div>
+                                    <div class="feature-tag" data-feature="parking">
+                                        <i class="fas fa-car mr-2"></i> Parking
+                                    </div>
+                                    <div class="feature-tag" data-feature="furnished">
+                                        <i class="fas fa-couch mr-2"></i> Furnished
+                                    </div>
+                                    <div class="feature-tag" data-feature="balcony">
+                                        <i class="fas fa-umbrella-beach mr-2"></i> Balcony
+                                    </div>
+                                    <div class="feature-tag" data-feature="ac">
+                                        <i class="fas fa-snowflake mr-2"></i> Air Conditioning
+                                    </div>
+                                    <div class="feature-tag" data-feature="fireplace">
+                                        <i class="fas fa-fire mr-2"></i> Fireplace
+                                    </div>
+                                </div>
+                                <button type="button" class="mt-3 text-sm text-teal-400 hover:text-teal-300 transition-colors duration-300">
+                                    <i class="fas fa-plus mr-1"></i> Add custom feature
+                                </button>
+                            </div>
+
+                            <!-- Amenities -->
+                            <div>
+                                <label class="block text-white font-medium mb-2">Amenities</label>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-3">
+                                        <span class="text-gray-300">WiFi</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-3">
+                                        <span class="text-gray-300">Gym</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-3">
+                                        <span class="text-gray-300">Elevator</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-3">
+                                        <span class="text-gray-300">Laundry</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-3">
+                                        <span class="text-gray-300">Pet Friendly</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-3">
+                                        <span class="text-gray-300">BBQ Area</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-3">
+                                        <span class="text-gray-300">Playground</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-3">
+                                        <span class="text-gray-300">Conference Room</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step Navigation -->
+                        <div class="flex justify-between mt-8 pt-6 border-t border-gray-800">
+                            <button type="button" onclick="previousStep(2)" class="px-6 py-3 rounded-xl bg-gray-800/50 text-gray-300 hover:text-white hover:bg-gray-700/50 transition-colors duration-300">
+                                <i class="fas fa-arrow-left mr-2"></i> Previous
+                            </button>
+                            <button type="button" onclick="nextStep(4)" class="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-teal-500 text-white font-semibold hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300">
+                                Next: Photos & Videos <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Photos & Videos -->
+                    <div class="form-section p-6" id="step4" style="display: none;">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h2 class="text-2xl font-bold text-white flex items-center">
+                                    <span class="w-8 h-8 rounded-lg bg-orange-500/20 border border-orange-500/30 flex items-center justify-center mr-3">
+                                        <i class="fas fa-camera text-orange-400"></i>
+                                    </span>
+                                    Photos & Videos
+                                </h2>
+                                <p class="text-gray-400 mt-1">Upload images and videos of your property</p>
+                            </div>
+                            <span class="text-xs px-3 py-1 rounded-full bg-teal-500/20 text-teal-400 border border-teal-500/30">
+                                Required
+                            </span>
+                        </div>
+
+                        <div class="space-y-6">
+                            <!-- Upload Zone -->
+                            <div class="upload-zone p-8 text-center" id="uploadZone">
+                                <i class="fas fa-cloud-upload-alt text-4xl text-gray-500 mb-4"></i>
+                                <h3 class="text-lg font-medium text-white mb-2">Drag & Drop Your Files Here</h3>
+                                <p class="text-gray-400 mb-4">Upload photos or videos of your property</p>
+                                <button type="button" id="browseBtn" class="px-6 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-white transition-colors duration-300">
+                                    <i class="fas fa-folder-open mr-2"></i> Browse Files
+                                </button>
+                                <p class="text-gray-500 text-sm mt-4">Supports JPG, PNG, MP4 up to 10MB each</p>
+                            </div>
+
+                            <!-- Uploaded Images Preview -->
+                            <div id="imagePreview" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <!-- Images will be added here -->
+                            </div>
+
+                            <!-- Image Guidelines -->
+                            <div class="bg-gray-800/30 rounded-xl p-4">
+                                <h4 class="font-medium text-white mb-2 flex items-center">
+                                    <i class="fas fa-lightbulb text-yellow-400 mr-2"></i>
+                                    Photo Tips for Better Results
+                                </h4>
+                                <ul class="text-gray-400 text-sm space-y-1">
+                                    <li class="flex items-center">
+                                        <i class="fas fa-check text-green-400 mr-2 text-xs"></i>
+                                        Use good lighting and take photos during daytime
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fas fa-check text-green-400 mr-2 text-xs"></i>
+                                        Include all rooms, kitchen, bathrooms, and outdoor areas
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fas fa-check text-green-400 mr-2 text-xs"></i>
+                                        Upload at least 5 photos for better visibility
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fas fa-check text-green-400 mr-2 text-xs"></i>
+                                        Show unique features and recent renovations
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Virtual Tour -->
+                            <div>
+                                <label class="block text-white font-medium mb-2">Virtual Tour Link</label>
+                                <input type="url" 
+                                       placeholder="https://your-virtual-tour-link.com"
+                                       class="form-input w-full px-4 py-3 rounded-xl">
+                                <p class="text-gray-400 text-sm mt-1">Add a link to your 360° virtual tour (optional)</p>
+                            </div>
+                        </div>
+
+                        <!-- Step Navigation -->
+                        <div class="flex justify-between mt-8 pt-6 border-t border-gray-800">
+                            <button type="button" onclick="previousStep(3)" class="px-6 py-3 rounded-xl bg-gray-800/50 text-gray-300 hover:text-white hover:bg-gray-700/50 transition-colors duration-300">
+                                <i class="fas fa-arrow-left mr-2"></i> Previous
+                            </button>
+                            <button type="button" onclick="nextStep(5)" class="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-teal-500 text-white font-semibold hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300">
+                                Next: Review & Submit <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Review & Submit -->
+                    <div class="form-section p-6" id="step5" style="display: none;">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h2 class="text-2xl font-bold text-white flex items-center">
+                                    <span class="w-8 h-8 rounded-lg bg-green-500/20 border border-green-500/30 flex items-center justify-center mr-3">
+                                        <i class="fas fa-check-circle text-green-400"></i>
+                                    </span>
+                                    Review & Submit
+                                </h2>
+                                <p class="text-gray-400 mt-1">Review your listing before submitting</p>
+                            </div>
+                            <div class="status-badge status-pending">
+                                <i class="fas fa-clock"></i>
+                                <span>Pending Submission</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <!-- Preview Card -->
+                            <div class="preview-card p-6">
+                                <div class="flex flex-col md:flex-row gap-6">
+                                    <!-- Preview Image -->
+                                    <div class="md:w-1/3">
+                                        <div class="aspect-video bg-gray-800 rounded-xl flex items-center justify-center">
+                                            <i class="fas fa-home text-4xl text-gray-600"></i>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Preview Details -->
+                                    <div class="md:w-2/3">
+                                        <h3 id="previewTitle" class="text-2xl font-bold text-white mb-2">Modern 3-Bedroom Apartment</h3>
+                                        <div class="flex items-center text-gray-400 mb-4">
+                                            <i class="fas fa-map-marker-alt text-teal-400 mr-2"></i>
+                                            <span id="previewLocation">Nairobi, Kenya</span>
+                                        </div>
+                                        
+                                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                            <div class="text-center p-3 rounded-lg bg-gray-800/50">
+                                                <div class="text-xl font-bold text-white" id="previewBedrooms">3</div>
+                                                <div class="text-gray-400 text-sm">Bedrooms</div>
+                                            </div>
+                                            <div class="text-center p-3 rounded-lg bg-gray-800/50">
+                                                <div class="text-xl font-bold text-white" id="previewBathrooms">2</div>
+                                                <div class="text-gray-400 text-sm">Bathrooms</div>
+                                            </div>
+                                            <div class="text-center p-3 rounded-lg bg-gray-800/50">
+                                                <div class="text-xl font-bold text-white" id="previewSqft">1,200</div>
+                                                <div class="text-gray-400 text-sm">Sq Ft</div>
+                                            </div>
+                                            <div class="text-center p-3 rounded-lg bg-gray-800/50">
+                                                <div class="text-xl font-bold text-white" id="previewPrice">Ksh 15M</div>
+                                                <div class="text-gray-400 text-sm" id="previewPriceType">For Sale</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <p id="previewDescription" class="text-gray-300">
+                                            Beautiful modern apartment with stunning views. Features include...
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Listing Options -->
+                            <div>
+                                <h3 class="text-lg font-medium text-white mb-4">Listing Options</h3>
+                                <div class="space-y-4">
+                                    <label class="flex items-center justify-between p-4 rounded-xl bg-gray-800/30 hover:bg-gray-800/50 transition-colors duration-300 cursor-pointer">
+                                        <div>
+                                            <div class="font-medium text-white">Immediate Listing</div>
+                                            <div class="text-gray-400 text-sm">List your property immediately after approval</div>
+                                        </div>
+                                        <div class="toggle-switch active">
+                                            <div class="toggle-knob"></div>
+                                        </div>
+                                    </label>
+                                    
+                                    <label class="flex items-center justify-between p-4 rounded-xl bg-gray-800/30 hover:bg-gray-800/50 transition-colors duration-300 cursor-pointer">
+                                        <div>
+                                            <div class="font-medium text-white">Schedule Listing</div>
+                                            <div class="text-gray-400 text-sm">Schedule your listing to go live at a specific date</div>
+                                        </div>
+                                        <div class="toggle-switch">
+                                            <div class="toggle-knob"></div>
+                                        </div>
+                                    </label>
+                                    
+                                    <label class="flex items-center justify-between p-4 rounded-xl bg-gray-800/30 hover:bg-gray-800/50 transition-colors duration-300 cursor-pointer">
+                                        <div>
+                                            <div class="font-medium text-white">Featured Listing</div>
+                                            <div class="text-gray-400 text-sm">Make your listing stand out (additional cost)</div>
+                                        </div>
+                                        <input type="checkbox" class="form-checkbox">
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Terms & Conditions -->
+                            <div class="bg-gray-800/30 rounded-xl p-4">
+                                <label class="flex items-start">
+                                    <input type="checkbox" required class="mt-1 mr-3">
+                                    <div class="text-gray-300 text-sm">
+                                        I agree to the <a href="#" class="text-teal-400 hover:text-teal-300">Terms of Service</a> and <a href="#" class="text-teal-400 hover:text-teal-300">Privacy Policy</a>. I confirm that I am the legal owner of this property or have authorization to list it. I understand that my listing will be reviewed by moderators before being published.
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Submission Status -->
+                            <div id="submissionStatus" class="hidden">
+                                <div class="bg-green-900/20 border border-green-500/30 rounded-xl p-4">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-check-circle text-green-400 text-2xl mr-3"></i>
+                                        <div>
+                                            <h4 class="font-medium text-white">Listing Submitted Successfully!</h4>
+                                            <p class="text-gray-300 text-sm">Your listing is now pending approval. You'll be notified once it's live.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step Navigation -->
+                        <div class="flex justify-between mt-8 pt-6 border-t border-gray-800">
+                            <button type="button" onclick="previousStep(4)" class="px-6 py-3 rounded-xl bg-gray-800/50 text-gray-300 hover:text-white hover:bg-gray-700/50 transition-colors duration-300">
+                                <i class="fas fa-arrow-left mr-2"></i> Previous
+                            </button>
+                            <button type="submit" id="submitBtn" class="px-6 py-3 rounded-xl bg-gradient-to-r from-green-600 to-teal-500 text-white font-semibold hover:shadow-lg hover:shadow-green-500/30 transition-all duration-300 success-pulse">
+                                <i class="fas fa-paper-plane mr-2"></i> Submit Listing
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Help Section -->
+            <div class="mt-8 p-6 bg-gray-800/30 rounded-2xl border border-gray-700/50">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-question-circle text-teal-400 text-xl mr-3"></i>
+                    <h3 class="text-lg font-medium text-white">Need Help?</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="p-4 rounded-xl bg-gray-800/50">
+                        <i class="fas fa-phone-alt text-blue-400 mb-2"></i>
+                        <div class="font-medium text-white mb-1">Call Support</div>
+                        <div class="text-gray-400 text-sm">+254 700 000 000</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-gray-800/50">
+                        <i class="fas fa-comments text-green-400 mb-2"></i>
+                        <div class="font-medium text-white mb-1">Live Chat</div>
+                        <div class="text-gray-400 text-sm">Available 24/7</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-gray-800/50">
+                        <i class="fas fa-file-alt text-orange-400 mb-2"></i>
+                        <div class="font-medium text-white mb-1">Guidelines</div>
+                        <a href="#" class="text-teal-400 hover:text-teal-300 text-sm">View posting guidelines</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Initialize GSAP
+        gsap.registerPlugin();
+
+        // Current step tracking
+        let currentStep = 1;
+        const totalSteps = 5;
+
+        // Image upload variables
+        let uploadedImages = [];
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeEventListeners();
+            updatePreview();
+        });
+
+        // Initialize all event listeners
+        function initializeEventListeners() {
+            // Listing type change (Sale/Rent)
+            document.querySelectorAll('input[name="listingType"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    updatePriceLabel();
+                });
+            });
+
+            // Price input formatting
+            const priceInput = document.getElementById('price');
+            if (priceInput) {
+                priceInput.addEventListener('input', function() {
+                    formatPriceInput(this);
+                    updatePreview();
+                });
+            }
+
+            // Property title update
+            const titleInput = document.getElementById('propertyTitle');
+            if (titleInput) {
+                titleInput.addEventListener('input', updatePreview);
+            }
+
+            // Location inputs
+            document.getElementById('country')?.addEventListener('change', updatePreview);
+            document.getElementById('city')?.addEventListener('change', updatePreview);
+            document.getElementById('neighborhood')?.addEventListener('input', updatePreview);
+
+            // Feature tags selection
+            document.querySelectorAll('.feature-tag').forEach(tag => {
+                tag.addEventListener('click', function() {
+                    this.classList.toggle('selected');
+                });
+            });
+
+            // Toggle switches
+            document.querySelectorAll('.toggle-switch').forEach(switchEl => {
+                switchEl.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                });
+            });
+
+            // Image upload
+            const uploadZone = document.getElementById('uploadZone');
+            const browseBtn = document.getElementById('browseBtn');
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.multiple = true;
+            fileInput.accept = 'image/*,video/*';
+            fileInput.style.display = 'none';
+
+            if (uploadZone && browseBtn) {
+                // Browse button click
+                browseBtn.addEventListener('click', () => fileInput.click());
+
+                // File input change
+                fileInput.addEventListener('change', handleFileSelect);
+
+                // Drag and drop
+                uploadZone.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.classList.add('dragover');
+                });
+
+                uploadZone.addEventListener('dragleave', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('dragover');
+                });
+
+                uploadZone.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('dragover');
+                    if (e.dataTransfer.files.length) {
+                        handleFileSelect({ target: { files: e.dataTransfer.files } });
+                    }
+                });
+
+                // Append file input to body
+                document.body.appendChild(fileInput);
+            }
+
+            // Form submission
+            const houseForm = document.getElementById('houseForm');
+            if (houseForm) {
+                houseForm.addEventListener('submit', handleFormSubmit);
+            }
+
+            // Logout button
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function() {
+                    if (confirm('Are you sure you want to logout?')) {
+                        window.location.href = 'index.html';
+                    }
+                });
+            }
+        }
+
+        // Update price label based on listing type
+        function updatePriceLabel() {
+            const priceLabel = document.getElementById('priceLabel');
+            const priceDescription = document.getElementById('priceDescription');
+            const pricePeriodContainer = document.getElementById('pricePeriodContainer');
+            const listingType = document.querySelector('input[name="listingType"]:checked')?.value;
+
+            if (listingType === 'rent') {
+                priceLabel.textContent = 'Monthly Rent (KES)';
+                priceDescription.textContent = 'Monthly rental price';
+                pricePeriodContainer?.classList.remove('hidden');
+            } else {
+                priceLabel.textContent = 'Price (KES)';
+                priceDescription.textContent = 'Total price for sale';
+                pricePeriodContainer?.classList.add('hidden');
+            }
+            updatePreview();
+        }
+
+        // Format price input with commas
+        function formatPriceInput(input) {
+            let value = input.value.replace(/\D/g, '');
+            if (value) {
+                value = parseInt(value).toLocaleString('en-US');
+            }
+            input.value = value;
+        }
+
+        // Handle file selection
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            const imagePreview = document.getElementById('imagePreview');
+            
+            if (!imagePreview) return;
+
+            for (let i = 0; i < Math.min(files.length, 12 - uploadedImages.length); i++) {
+                const file = files[i];
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    const imageData = {
+                        id: Date.now() + i,
+                        url: e.target.result,
+                        name: file.name,
+                        type: file.type.startsWith('image/') ? 'image' : 'video'
+                    };
+
+                    uploadedImages.push(imageData);
+                    renderImagePreview(imageData);
+                };
+
+                reader.readAsDataURL(file);
+            }
+
+            // Reset file input
+            event.target.value = '';
+        }
+
+        // Render image preview
+        function renderImagePreview(imageData) {
+            const imagePreview = document.getElementById('imagePreview');
+            if (!imagePreview) return;
+
+            const previewDiv = document.createElement('div');
+            previewDiv.className = 'image-preview group';
+            previewDiv.dataset.id = imageData.id;
+
+            previewDiv.innerHTML = `
+                <div class="aspect-square rounded-lg overflow-hidden bg-gray-800 relative">
+                    ${imageData.type === 'image' 
+                        ? `<img src="${imageData.url}" alt="${imageData.name}" class="w-full h-full object-cover">`
+                        : `<div class="w-full h-full flex items-center justify-center">
+                                <i class="fas fa-video text-3xl text-gray-500"></i>
+                           </div>`
+                    }
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <button type="button" class="remove-btn absolute top-2 right-2 w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-white hover:bg-red-700 transition-colors duration-300">
+                            <i class="fas fa-times text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="mt-2 text-xs text-gray-400 truncate">${imageData.name}</div>
+            `;
+
+            // Add remove button event
+            const removeBtn = previewDiv.querySelector('.remove-btn');
+            removeBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                removeImage(imageData.id);
+            });
+
+            imagePreview.appendChild(previewDiv);
+
+            // Animate entrance
+            gsap.from(previewDiv, {
+                scale: 0.8,
+                opacity: 0,
+                duration: 0.3,
+                ease: "back.out(1.7)"
+            });
+        }
+
+        // Remove image
+        function removeImage(imageId) {
+            uploadedImages = uploadedImages.filter(img => img.id !== imageId);
+            const preview = document.querySelector(`.image-preview[data-id="${imageId}"]`);
+            if (preview) {
+                gsap.to(preview, {
+                    scale: 0.8,
+                    opacity: 0,
+                    duration: 0.2,
+                    onComplete: () => preview.remove()
+                });
+            }
+        }
+
+        // Step navigation
+        function nextStep(step) {
+            // Validate current step before proceeding
+            if (!validateStep(currentStep)) {
+                return;
+            }
+
+            // Hide current step
+            document.getElementById(`step${currentStep}`).style.display = 'none';
+            document.querySelector(`.step[data-step="${currentStep}"]`).classList.remove('active');
+
+            // Show next step
+            document.getElementById(`step${step}`).style.display = 'block';
+            document.querySelector(`.step[data-step="${step}"]`).classList.add('active');
+
+            // Update current step
+            currentStep = step;
+
+            // Update form section active state
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(`step${step}`).classList.add('active');
+
+            // Animate step transition
+            gsap.from(`#step${step}`, {
+                opacity: 0,
+                y: 20,
+                duration: 0.5,
+                ease: "power2.out"
+            });
+
+            // Update preview on step 5
+            if (step === 5) {
+                updatePreview();
+            }
+        }
+
+        function previousStep(step) {
+            // Hide current step
+            document.getElementById(`step${currentStep}`).style.display = 'none';
+            document.querySelector(`.step[data-step="${currentStep}"]`).classList.remove('active');
+
+            // Show previous step
+            document.getElementById(`step${step}`).style.display = 'block';
+            document.querySelector(`.step[data-step="${step}"]`).classList.add('active');
+
+            // Update current step
+            currentStep = step;
+
+            // Update form section active state
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(`step${step}`).classList.add('active');
+
+            // Animate step transition
+            gsap.from(`#step${step}`, {
+                opacity: 0,
+                x: -20,
+                duration: 0.5,
+                ease: "power2.out"
+            });
+        }
+
+        // Validate step before proceeding
+        function validateStep(step) {
+            let isValid = true;
+            const errorInputs = [];
+
+            switch(step) {
+                case 1:
+                    // Validate required fields
+                    const title = document.getElementById('propertyTitle');
+                    const price = document.getElementById('price');
+                    const listingType = document.querySelector('input[name="listingType"]:checked');
+
+                    if (!title?.value.trim()) {
+                        showFieldError(title, 'Property title is required');
+                        errorInputs.push(title);
+                        isValid = false;
+                    }
+
+                    if (!price?.value) {
+                        showFieldError(price, 'Price is required');
+                        errorInputs.push(price);
+                        isValid = false;
+                    }
+
+                    if (!listingType) {
+                        showNotification('Please select listing type (For Sale or For Rent)', 'error');
+                        isValid = false;
+                    }
+                    break;
+
+                case 2:
+                    // Validate location
+                    const country = document.getElementById('country');
+                    const city = document.getElementById('city');
+                    const neighborhood = document.getElementById('neighborhood');
+
+                    if (!country?.value) {
+                        showFieldError(country, 'Country is required');
+                        errorInputs.push(country);
+                        isValid = false;
+                    }
+
+                    if (!city?.value) {
+                        showFieldError(city, 'City is required');
+                        errorInputs.push(city);
+                        isValid = false;
+                    }
+
+                    if (!neighborhood?.value.trim()) {
+                        showFieldError(neighborhood, 'Neighborhood is required');
+                        errorInputs.push(neighborhood);
+                        isValid = false;
+                    }
+                    break;
+
+                case 4:
+                    // Validate images
+                    if (uploadedImages.length < 1) {
+                        showNotification('Please upload at least one photo of your property', 'error');
+                        isValid = false;
+                    }
+                    break;
+            }
+
+            // Clear previous errors
+            document.querySelectorAll('.form-input').forEach(input => {
+                if (!errorInputs.includes(input)) {
+                    input.classList.remove('error-input');
+                }
+            });
+
+            return isValid;
+        }
+
+        // Show field error
+        function showFieldError(input, message) {
+            if (!input) return;
+            
+            input.classList.add('error-input');
+            
+            // Create error message if not exists
+            let errorMsg = input.nextElementSibling;
+            if (!errorMsg || !errorMsg.classList.contains('error-message')) {
+                errorMsg = document.createElement('p');
+                errorMsg.className = 'error-message text-red-400 text-sm mt-1';
+                input.parentNode.appendChild(errorMsg);
+            }
+            errorMsg.textContent = message;
+
+            // Animate error
+            gsap.from(input, {
+                x: [-10, 10, -10, 10, 0],
+                duration: 0.5,
+                ease: "power2.out"
+            });
+        }
+
+        // Update preview card
+        function updatePreview() {
+            // Title
+            const title = document.getElementById('propertyTitle')?.value || 'Modern Property';
+            document.getElementById('previewTitle').textContent = title;
+
+            // Location
+            const country = document.getElementById('country')?.value || 'Kenya';
+            const city = document.getElementById('city')?.value || 'Nairobi';
+            const neighborhood = document.getElementById('neighborhood')?.value || 'Prime Location';
+            document.getElementById('previewLocation').textContent = `${neighborhood}, ${city}, ${country}`;
+
+            // Price
+            const price = document.getElementById('price')?.value || '0';
+            const listingType = document.querySelector('input[name="listingType"]:checked')?.value || 'sale';
+            const pricePeriod = listingType === 'rent' ? '/month' : '';
+            
+            document.getElementById('previewPrice').textContent = `Ksh ${parseInt(price.replace(/\D/g, '') || 0).toLocaleString()}${pricePeriod}`;
+            document.getElementById('previewPriceType').textContent = listingType === 'rent' ? 'For Rent' : 'For Sale';
+
+            // Other details (these would come from step 3 in real implementation)
+            const bedrooms = document.querySelector('select:nth-child(1)')?.value || '3';
+            const bathrooms = document.querySelector('select:nth-child(2)')?.value || '2';
+            const sqft = document.querySelector('input[type="number"][placeholder="0"]')?.value || '1,200';
+
+            document.getElementById('previewBedrooms').textContent = bedrooms;
+            document.getElementById('previewBathrooms').textContent = bathrooms;
+            document.getElementById('previewSqft').textContent = sqft;
+        }
+
+        // Handle form submission
+        function handleFormSubmit(event) {
+            event.preventDefault();
+
+            // Validate all steps
+            for (let i = 1; i <= totalSteps; i++) {
+                if (!validateStep(i)) {
+                    showNotification(`Please complete Step ${i} correctly`, 'error');
+                    nextStep(i);
+                    return;
+                }
+            }
+
+            // Validate terms agreement
+            const termsCheckbox = document.querySelector('input[type="checkbox"][required]');
+            if (!termsCheckbox?.checked) {
+                showNotification('Please agree to the terms and conditions', 'error');
+                return;
+            }
+
+            // Show loading state
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Submitting...';
+            submitBtn.disabled = true;
+
+            // Simulate API call
+            setTimeout(() => {
+                // Show success
+                submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Submitted!';
+                submitBtn.classList.remove('success-pulse');
+                submitBtn.classList.add('bg-gradient-to-r', 'from-green-600', 'to-teal-500');
+
+                // Show submission status
+                const statusDiv = document.getElementById('submissionStatus');
+                if (statusDiv) {
+                    statusDiv.classList.remove('hidden');
+                    gsap.from(statusDiv, {
+                        opacity: 0,
+                        y: 20,
+                        duration: 0.5,
+                        ease: "power2.out"
+                    });
+                }
+
+                // Update status badge
+                const statusBadge = document.querySelector('.status-badge');
+                if (statusBadge) {
+                    statusBadge.className = 'status-badge status-pending';
+                    statusBadge.innerHTML = '<i class="fas fa-clock"></i><span>Pending Approval</span>';
+                }
+
+                // Show success notification
+                showNotification('Your listing has been submitted for approval!', 'success');
+
+                // Reset form after delay
+                setTimeout(() => {
+                    // In a real app, you might redirect or reset the form
+                    window.location.href = 'profile.html';
+                }, 3000);
+            }, 2000);
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 px-6 py-3 rounded-xl backdrop-blur-sm border z-50 transform translate-x-full ${
+                type === 'success' 
+                    ? 'bg-green-900/30 border-green-500/30 text-green-300' 
+                    : type === 'error'
+                    ? 'bg-red-900/30 border-red-500/30 text-red-300'
+                    : 'bg-blue-900/30 border-blue-500/30 text-blue-300'
+            }`;
+            notification.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <i class="fas ${
+                        type === 'success' ? 'fa-check-circle' :
+                        type === 'error' ? 'fa-exclamation-circle' :
+                        'fa-info-circle'
+                    }"></i>
+                    <span class="text-sm">${message}</span>
+                </div>
+            `;
+
+            document.body.appendChild(notification);
+
+            // Animate in
+            gsap.to(notification, {
+                x: 0,
+                duration: 0.5,
+                ease: "back.out(1.7)"
+            });
+
+            // Remove after delay
+            setTimeout(() => {
+                gsap.to(notification, {
+                    x: 500,
+                    opacity: 0,
+                    duration: 0.3,
+                    onComplete: () => notification.remove()
+                });
+            }, 5000);
+        }
+
+        // Make functions available globally for inline onclick
+        window.nextStep = nextStep;
+        window.previousStep = previousStep;
+    </script>
+</body>
+</html>
