@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movers & Homes | Authentication</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        :root {
+            --primary-blue: #0a2463;
+            --secondary-blue: #3e78b2;
+            --accent-orange: #ff6b35;
+            --accent-teal: #4ecdc4;
+            --dark-gray: #1a1a2e;
+            --light-gray: #f8f9fa;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-gray);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .auth-container {
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Animated Background */
+        .auth-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                rgba(10, 36, 99, 0.9) 0%,
+                rgba(26, 26, 46, 0.95) 30%,
+                rgba(26, 26, 46, 1) 100%);
+            z-index: 1;
+        }
+        
+        /* Floating Elements */
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.1;
+            z-index: 2;
+            animation: float 20s infinite linear;
+        }
+        
+        .element-1 {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, var(--accent-teal), var(--secondary-blue));
+            top: -150px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+        
+        .element-2 {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, var(--accent-orange), #ff8c42);
+            bottom: -200px;
+            left: -150px;
+            animation-delay: 5s;
+        }
+        
+        .element-3 {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
+            top: 50%;
+            right: 20%;
+            animation-delay: 10s;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            25% {
+                transform: translateY(-20px) rotate(90deg);
+            }
+            50% {
+                transform: translateY(0) rotate(180deg);
+            }
+            75% {
+                transform: translateY(20px) rotate(270deg);
+            }
+        }
+        
+        /* House and Truck Animation */
+        .moving-scene {
+            position: absolute;
+            bottom: 10%;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            z-index: 2;
+            opacity: 0.1;
+        }
+        
+        .moving-truck {
+            position: absolute;
+            width: 150px;
+            height: 80px;
+            bottom: 0;
+            left: -200px;
+            animation: truckMove 25s linear infinite;
+        }
+        
+        .house-icon {
+            position: absolute;
+            bottom: 0;
+            right: 15%;
+            font-size: 80px;
+            color: var(--accent-teal);
+            opacity: 0.3;
+            animation: houseGlow 4s ease-in-out infinite;
+        }
+        
+        @keyframes truckMove {
+            0% {
+                left: -200px;
+                transform: scaleX(1);
+            }
+            49% {
+                left: calc(100% + 200px);
+                transform: scaleX(1);
+            }
+            50% {
+                left: calc(100% + 200px);
+                transform: scaleX(-1);
+            }
+            100% {
+                left: -200px;
+                transform: scaleX(-1);
+            }
+        }
+        
+        @keyframes houseGlow {
+            0%, 100% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(1.05);
+            }
+        }
+        
+        /* Auth Card Styles */
+        .auth-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-teal), var(--accent-orange), var(--secondary-blue));
+            background-size: 300% 100%;
+            animation: gradientShift 3s ease infinite;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+        
+        /* Form Styles */
+        .form-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-teal);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
+        }
+        
+        .form-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus + .form-icon {
+            color: var(--accent-teal);
+        }
+        
+        /* Password Toggle */
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .password-toggle:hover {
+            color: var(--accent-teal);
+        }
+        
+        /* Tabs */
+        .auth-tab {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .auth-tab.active {
+            color: white;
+        }
+        
+        .auth-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-teal), var(--secondary-blue));
+            border-radius: 3px;
+        }
+        
+        /* Forms */
+        .auth-form {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+        
+        .auth-form.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Role Selection */
+        .role-option {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .role-option:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+        
+        .role-option.selected {
+            background: rgba(78, 205, 196, 0.1);
+            border-color: var(--accent-teal);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .role-option.selected::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-teal), var(--secondary-blue));
+        }
+        
+        /* Switch Between Login/Register */
+        .auth-switch {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .auth-switch-btn {
+            background: none;
+            border: none;
+            color: var(--accent-teal);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+        
+        .auth-switch-btn:hover {
+            background: rgba(78, 205, 196, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        /* Button Styles */
+        .auth-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--accent-teal), var(--secondary-blue));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .auth-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .auth-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.7s ease;
+        }
+        
+        .auth-btn:hover::before {
+            left: 100%;
+        }
+        
+        /* Social Login */
+        .social-login {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .social-btn:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .social-btn.facebook:hover {
+            background: #1877f2;
+            border-color: #1877f2;
+        }
+        
+        .social-btn.google:hover {
+            background: #db4437;
+            border-color: #db4437;
+        }
+        
+        .social-btn.apple:hover {
+            background: #000000;
+            border-color: #000000;
+        }
+        
+        /* Terms Checkbox */
+        .terms-checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+        
+        .terms-checkbox input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-top: 0.25rem;
+            accent-color: var(--accent-teal);
+        }
+        
+        /* Loading Animation */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Success/Error Messages */
+        .auth-message {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+        
+        .auth-message.success {
+            background: rgba(78, 205, 196, 0.1);
+            border: 1px solid var(--accent-teal);
+            color: var(--accent-teal);
+            display: block;
+        }
+        
+        .auth-message.error {
+            background: rgba(255, 107, 53, 0.1);
+            border: 1px solid var(--accent-orange);
+            color: var(--accent-orange);
+            display: block;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Back to Home */
+        .back-home {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            z-index: 10;
+        }
+        
+        .back-home-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .back-home-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(-5px);
+        }
+        
+        /* Register Steps */
+        .register-step {
+            display: none;
+        }
+        
+        .register-step.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .auth-card {
+                max-width: 500px;
+                width: 90%;
+            }
+            
+            .moving-scene {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .back-home {
+                top: 1rem;
+                left: 1rem;
+            }
+            
+            .back-home-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .social-login {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .auth-card {
+                padding: 1.5rem !important;
+            }
+            
+            .role-option {
+                padding: 1rem;
+            }
+            
+            .form-input {
+                padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+            }
+            
+            .form-icon {
+                left: 0.75rem;
+            }
+        }
+        
+        /* Logo Animation */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+        
+        .logo-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-teal), var(--secondary-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+        
+        @keyframes logoFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Back to Home -->
+    <div class="back-home">
+        <a href="index.html" class="back-home-btn">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back to Home</span>
+        </a>
+    </div>
+    
+    <!-- Main Container -->
+    <div class="auth-container flex items-center justify-center p-4">
+        <!-- Background Elements -->
+        <div class="auth-bg"></div>
+        
+        <!-- Floating Elements -->
+        <div class="floating-element element-1"></div>
+        <div class="floating-element element-2"></div>
+        <div class="floating-element element-3"></div>
+        
+        <!-- Moving Scene -->
+        <div class="moving-scene">
+            <div class="moving-truck">
+                <div class="truck-cabin" style="width: 60px; height: 50px; background: var(--accent-orange); border-radius: 10px 10px 0 0; position: absolute; bottom: 30px; left: 0;"></div>
+                <div class="truck-body" style="width: 120px; height: 60px; background: linear-gradient(135deg, var(--accent-orange), #ff8c42); border-radius: 10px 0 0 10px; position: absolute; bottom: 0; left: 30px;"></div>
+                <div class="truck-wheel" style="width: 30px; height: 30px; background: #1a202c; border-radius: 50%; position: absolute; bottom: -5px; left: 20px; border: 3px solid #4a5568;"></div>
+                <div class="truck-wheel" style="width: 30px; height: 30px; background: #1a202c; border-radius: 50%; position: absolute; bottom: -5px; left: 110px; border: 3px solid #4a5568;"></div>
+            </div>
+            <i class="fas fa-home house-icon"></i>
+        </div>
+        
+        <!-- Auth Card -->
+        <div class="auth-card p-8 max-w-md w-full z-10">
+            <!-- Logo -->
+            <div class="logo-container">
+                <div class="logo-circle">
+                    <i class="fas fa-home text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold">Movers & Homes</h1>
+                    <p class="text-gray-400 text-sm">Your Seamless Relocation Experience</p>
+                </div>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="flex mb-8">
+                <button id="loginTab" class="auth-tab flex-1 py-3 text-center font-semibold text-white active">
+                    Login
+                </button>
+                <button id="registerTab" class="auth-tab flex-1 py-3 text-center font-semibold text-gray-400">
+                    Register
+                </button>
+            </div>
+            
+            <!-- Messages -->
+            <div id="authMessage" class="auth-message"></div>
+            
+            <!-- Login Form -->
+            <form id="loginForm" class="auth-form active">
+                <div class="form-group">
+                    <input type="email" id="loginEmail" class="form-input" placeholder="Email Address" required>
+                    <i class="fas fa-envelope form-icon"></i>
+                </div>
+                
+                <div class="form-group">
+                    <input type="password" id="loginPassword" class="form-input" placeholder="Password" required>
+                    <i class="fas fa-lock form-icon"></i>
+                    <button type="button" class="password-toggle" onclick="togglePassword('loginPassword', this)">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                
+                <div class="flex justify-between items-center mb-6">
+                    <label class="flex items-center text-gray-300 text-sm">
+                        <input type="checkbox" class="mr-2" id="rememberMe">
+                        Remember me
+                    </label>
+                    <button type="button" id="forgotPassword" class="text-accent-teal text-sm hover:underline">
+                        Forgot password?
+                    </button>
+                </div>
+                
+                <button type="submit" class="auth-btn mb-4">
+                    <span id="loginBtnText">Login to Account</span>
+                    <span id="loginLoading" class="loading-spinner" style="display: none;"></span>
+                </button>
+                
+                <div class="text-center text-gray-400 mb-4">or continue with</div>
+                
+                <div class="social-login mb-6">
+                    <button type="button" class="social-btn facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </button>
+                    <button type="button" class="social-btn google">
+                        <i class="fab fa-google"></i>
+                    </button>
+                    <button type="button" class="social-btn apple">
+                        <i class="fab fa-apple"></i>
+                    </button>
+                </div>
+                
+                <div class="auth-switch">
+                    <span class="text-gray-400">Don't have an account?</span>
+                    <button type="button" class="auth-switch-btn" onclick="showRegister()">Create Account</button>
+                </div>
+            </form>
+            
+            <!-- Registration Form -->
+            <form id="registerForm" class="auth-form">
+                <!-- Step 1: Basic Info -->
+                <div class="register-step active" data-step="1">
+                    <div class="form-group">
+                        <input type="text" id="registerName" class="form-input" placeholder="Full Name" required>
+                        <i class="fas fa-user form-icon"></i>
+                    </div>
+                    
+                    <div class="form-group">
+                        <input type="email" id="registerEmail" class="form-input" placeholder="Email Address" required>
+                        <i class="fas fa-envelope form-icon"></i>
+                    </div>
+                    
+                    <div class="form-group">
+                        <input type="tel" id="registerPhone" class="form-input" placeholder="Phone Number" required>
+                        <i class="fas fa-phone form-icon"></i>
+                    </div>
+                    
+                    <div class="flex justify-between mt-6">
+                        <button type="button" class="auth-btn next-step" data-next="2">
+                            Next <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Step 2: Account Type -->
+                <div class="register-step" data-step="2">
+                    <h3 class="text-white text-lg font-semibold mb-4">Choose Your Role</h3>
+                    <p class="text-gray-400 mb-6">Select how you want to use our platform</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div class="role-option" data-role="seeker" onclick="selectRole(this)">
+                            <div>
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-600/20 to-teal-500/20 flex items-center justify-center mb-3 mx-auto">
+                                    <i class="fas fa-search text-blue-400 text-xl"></i>
+                                </div>
+                                <h4 class="text-white font-semibold">House Seeker</h4>
+                                <p class="text-gray-400 text-sm mt-1">Looking for a home to rent or buy</p>
+                            </div>
+                        </div>
+                        
+                        <div class="role-option" data-role="owner" onclick="selectRole(this)">
+                            <div>
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-r from-orange-600/20 to-red-500/20 flex items-center justify-center mb-3 mx-auto">
+                                    <i class="fas fa-home text-orange-400 text-xl"></i>
+                                </div>
+                                <h4 class="text-white font-semibold">House Owner</h4>
+                                <p class="text-gray-400 text-sm mt-1">List and manage your properties</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" id="userRole" name="role" required>
+                    
+                    <div class="flex justify-between mt-6">
+                        <button type="button" class="px-6 py-3 bg-gray-800/50 text-white rounded-lg hover:bg-gray-700/50 transition-all duration-300 prev-step">
+                            <i class="fas fa-arrow-left mr-2"></i> Back
+                        </button>
+                        <button type="button" class="auth-btn next-step" data-next="3">
+                            Next <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Step 3: Security -->
+                <div class="register-step" data-step="3">
+                    <div class="form-group">
+                        <input type="password" id="registerPassword" class="form-input" placeholder="Create Password" required>
+                        <i class="fas fa-lock form-icon"></i>
+                        <button type="button" class="password-toggle" onclick="togglePassword('registerPassword', this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <input type="password" id="registerConfirmPassword" class="form-input" placeholder="Confirm Password" required>
+                        <i class="fas fa-lock form-icon"></i>
+                        <button type="button" class="password-toggle" onclick="togglePassword('registerConfirmPassword', this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="terms-checkbox">
+                        <input type="checkbox" id="agreeTerms" required>
+                        <label for="agreeTerms" class="text-gray-300 text-sm">
+                            I agree to the <a href="#" class="text-accent-teal hover:underline">Terms of Service</a> and <a href="#" class="text-accent-teal hover:underline">Privacy Policy</a>
+                        </label>
+                    </div>
+                    
+                    <div class="flex justify-between mt-6">
+                        <button type="button" class="px-6 py-3 bg-gray-800/50 text-white rounded-lg hover:bg-gray-700/50 transition-all duration-300 prev-step">
+                            <i class="fas fa-arrow-left mr-2"></i> Back
+                        </button>
+                        <button type="submit" class="auth-btn">
+                            <span id="registerBtnText">Create Account</span>
+                            <span id="registerLoading" class="loading-spinner" style="display: none;"></span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="auth-switch mt-6">
+                    <span class="text-gray-400">Already have an account?</span>
+                    <button type="button" class="auth-switch-btn" onclick="showLogin()">Login Here</button>
+                </div>
+            </form>
+            
+            <!-- Forgot Password Form -->
+            <form id="forgotPasswordForm" class="auth-form">
+                <h3 class="text-white text-xl font-semibold mb-2">Reset Password</h3>
+                <p class="text-gray-400 mb-6">Enter your email address and we'll send you a reset link</p>
+                
+                <div class="form-group">
+                    <input type="email" id="resetEmail" class="form-input" placeholder="Email Address" required>
+                    <i class="fas fa-envelope form-icon"></i>
+                </div>
+                
+                <button type="submit" class="auth-btn mb-4">
+                    <span id="resetBtnText">Send Reset Link</span>
+                    <span id="resetLoading" class="loading-spinner" style="display: none;"></span>
+                </button>
+                
+                <div class="auth-switch">
+                    <button type="button" class="auth-switch-btn" onclick="showLogin()">
+                        <i class="fas fa-arrow-left mr-2"></i> Back to Login
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Initialize GSAP
+        gsap.registerPlugin();
+        
+        // DOM Elements
+        const loginTab = document.getElementById('loginTab');
+        const registerTab = document.getElementById('registerTab');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+        const authMessage = document.getElementById('authMessage');
+        const userRoleInput = document.getElementById('userRole');
+        
+        let currentStep = 1;
+        let selectedRole = '';
+        
+        // Initialize forms
+        function initForms() {
+            showLogin();
+            
+            // Add animations to form elements
+            gsap.from('.auth-card', {
+                duration: 1,
+                y: 50,
+                opacity: 0,
+                ease: "power3.out"
+            });
+            
+            // Animate logo
+            gsap.from('.logo-container', {
+                duration: 0.8,
+                y: -30,
+                opacity: 0,
+                delay: 0.3,
+                ease: "back.out(1.7)"
+            });
+        }
+        
+        // Show login form
+        function showLogin() {
+            // Update tabs
+            loginTab.classList.add('active');
+            loginTab.classList.remove('text-gray-400');
+            loginTab.classList.add('text-white');
+            
+            registerTab.classList.remove('active');
+            registerTab.classList.remove('text-white');
+            registerTab.classList.add('text-gray-400');
+            
+            // Update forms
+            loginForm.classList.add('active');
+            registerForm.classList.remove('active');
+            forgotPasswordForm.classList.remove('active');
+            
+            // Reset register form
+            resetRegisterForm();
+            
+            // Animate form switch
+            animateFormSwitch(loginForm);
+        }
+        
+        // Show register form
+        function showRegister() {
+            // Update tabs
+            registerTab.classList.add('active');
+            registerTab.classList.remove('text-gray-400');
+            registerTab.classList.add('text-white');
+            
+            loginTab.classList.remove('active');
+            loginTab.classList.remove('text-white');
+            loginTab.classList.add('text-gray-400');
+            
+            // Update forms
+            registerForm.classList.add('active');
+            loginForm.classList.remove('active');
+            forgotPasswordForm.classList.remove('active');
+            
+            // Reset current step
+            currentStep = 1;
+            updateRegisterSteps();
+            
+            // Animate form switch
+            animateFormSwitch(registerForm);
+        }
+        
+        // Show forgot password form
+        function showForgotPassword() {
+            // Update tabs (remove active from both)
+            loginTab.classList.remove('active', 'text-white');
+            loginTab.classList.add('text-gray-400');
+            registerTab.classList.remove('active', 'text-white');
+            registerTab.classList.add('text-gray-400');
+            
+            // Update forms
+            forgotPasswordForm.classList.add('active');
+            loginForm.classList.remove('active');
+            registerForm.classList.remove('active');
+            
+            // Animate form switch
+            animateFormSwitch(forgotPasswordForm);
+        }
+        
+        // Animate form switch
+        function animateFormSwitch(form) {
+            gsap.from(form, {
+                duration: 0.5,
+                x: -20,
+                opacity: 0,
+                ease: "power2.out"
+            });
+        }
+        
+        // Select role in registration
+        function selectRole(element) {
+            // Remove selected class from all options
+            document.querySelectorAll('.role-option').forEach(option => {
+                option.classList.remove('selected');
+                gsap.to(option, {
+                    scale: 1,
+                    duration: 0.3,
+                    ease: "power2.out"
+                });
+            });
+            
+            // Add selected class to clicked option
+            element.classList.add('selected');
+            selectedRole = element.dataset.role;
+            userRoleInput.value = selectedRole;
+            
+            // Animate selection
+            gsap.to(element, {
+                scale: 1.05,
+                duration: 0.3,
+                ease: "back.out(1.7)"
+            });
+            
+            // Show success animation
+            const icon = element.querySelector('i');
+            gsap.to(icon, {
+                rotation: 360,
+                duration: 0.6,
+                ease: "back.out(1.7)"
+            });
+        }
+        
+        // Update register steps visibility
+        function updateRegisterSteps() {
+            document.querySelectorAll('.register-step').forEach(step => {
+                if (parseInt(step.dataset.step) === currentStep) {
+                    step.classList.add('active');
+                    gsap.from(step, {
+                        duration: 0.5,
+                        x: -20,
+                        opacity: 0,
+                        ease: "power2.out"
+                    });
+                } else {
+                    step.classList.remove('active');
+                }
+            });
+        }
+        
+        // Go to next step in registration
+        document.querySelectorAll('.next-step').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const nextStep = parseInt(this.dataset.next);
+                
+                // Validate current step
+                if (currentStep === 1) {
+                    if (!validateStep1()) return;
+                } else if (currentStep === 2) {
+                    if (!validateStep2()) return;
+                }
+                
+                currentStep = nextStep;
+                updateRegisterSteps();
+                
+                // Animate step transition
+                const currentStepElement = document.querySelector(`.register-step[data-step="${currentStep}"]`);
+                gsap.from(currentStepElement, {
+                    duration: 0.5,
+                    x: 20,
+                    opacity: 0,
+                    ease: "power2.out"
+                });
+            });
+        });
+        
+        // Go to previous step in registration
+        document.querySelectorAll('.prev-step').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                if (currentStep > 1) {
+                    currentStep--;
+                    updateRegisterSteps();
+                    
+                    // Animate step transition
+                    const currentStepElement = document.querySelector(`.register-step[data-step="${currentStep}"]`);
+                    gsap.from(currentStepElement, {
+                        duration: 0.5,
+                        x: -20,
+                        opacity: 0,
+                        ease: "power2.out"
+                    });
+                }
+            });
+        });
+        
+        // Validate step 1
+        function validateStep1() {
+            const name = document.getElementById('registerName').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const phone = document.getElementById('registerPhone').value.trim();
+            
+            if (!name || name.length < 2) {
+                showMessage('Please enter a valid name', 'error');
+                shakeElement('registerName');
+                return false;
+            }
+            
+            if (!email || !isValidEmail(email)) {
+                showMessage('Please enter a valid email address', 'error');
+                shakeElement('registerEmail');
+                return false;
+            }
+            
+            if (!phone || phone.length < 10) {
+                showMessage('Please enter a valid phone number', 'error');
+                shakeElement('registerPhone');
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // Validate step 2
+        function validateStep2() {
+            if (!selectedRole) {
+                showMessage('Please select your role', 'error');
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // Validate step 3
+        function validateStep3() {
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            const agreeTerms = document.getElementById('agreeTerms').checked;
+            
+            if (!password || password.length < 8) {
+                showMessage('Password must be at least 8 characters long', 'error');
+                shakeElement('registerPassword');
+                return false;
+            }
+            
+            if (password !== confirmPassword) {
+                showMessage('Passwords do not match', 'error');
+                shakeElement('registerConfirmPassword');
+                return false;
+            }
+            
+            if (!agreeTerms) {
+                showMessage('You must agree to the terms and conditions', 'error');
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // Toggle password visibility
+        function togglePassword(inputId, button) {
+            const input = document.getElementById(inputId);
+            const icon = button.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+                
+                // Animate icon
+                gsap.to(icon, {
+                    rotation: 360,
+                    duration: 0.5,
+                    ease: "back.out(1.7)"
+                });
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+        
+        // Show message
+        function showMessage(message, type) {
+            authMessage.textContent = message;
+            authMessage.className = `auth-message ${type}`;
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                authMessage.className = 'auth-message';
+            }, 5000);
+        }
+        
+        // Shake element animation
+        function shakeElement(elementId) {
+            const element = document.getElementById(elementId);
+            gsap.to(element, {
+                x: -10,
+                duration: 0.1,
+                repeat: 5,
+                yoyo: true,
+                ease: "power2.out"
+            });
+        }
+        
+        // Validate email format
+        function isValidEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+        
+        // Reset register form
+        function resetRegisterForm() {
+            currentStep = 1;
+            selectedRole = '';
+            userRoleInput.value = '';
+            
+            document.getElementById('registerName').value = '';
+            document.getElementById('registerEmail').value = '';
+            document.getElementById('registerPhone').value = '';
+            document.getElementById('registerPassword').value = '';
+            document.getElementById('registerConfirmPassword').value = '';
+            document.getElementById('agreeTerms').checked = false;
+            
+            document.querySelectorAll('.role-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            updateRegisterSteps();
+        }
+        
+        // Form submission handlers
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+            
+            if (!isValidEmail(email)) {
+                showMessage('Please enter a valid email address', 'error');
+                return;
+            }
+            
+            // Show loading
+            const btnText = document.getElementById('loginBtnText');
+            const loading = document.getElementById('loginLoading');
+            btnText.style.display = 'none';
+            loading.style.display = 'inline-block';
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Reset loading
+                btnText.style.display = 'inline';
+                loading.style.display = 'none';
+                
+                // Show success message
+                showMessage('Login successful! Redirecting...', 'success');
+                
+                // Simulate redirect based on role
+                setTimeout(() => {
+                    // In real app, this would redirect based on user role
+                    window.location.href = 'dashboard.html';
+                }, 1500);
+            }, 2000);
+        });
+        
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!validateStep3()) return;
+            
+            // Show loading
+            const btnText = document.getElementById('registerBtnText');
+            const loading = document.getElementById('registerLoading');
+            btnText.style.display = 'none';
+            loading.style.display = 'inline-block';
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Reset loading
+                btnText.style.display = 'inline';
+                loading.style.display = 'none';
+                
+                // Show success message
+                showMessage('Account created successfully! Welcome to Movers & Homes', 'success');
+                
+                // Reset form and show login
+                setTimeout(() => {
+                    resetRegisterForm();
+                    showLogin();
+                }, 2000);
+            }, 2000);
+        });
+        
+        document.getElementById('forgotPasswordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('resetEmail').value;
+            
+            if (!email || !isValidEmail(email)) {
+                showMessage('Please enter a valid email address', 'error');
+                return;
+            }
+            
+            // Show loading
+            const btnText = document.getElementById('resetBtnText');
+            const loading = document.getElementById('resetLoading');
+            btnText.style.display = 'none';
+            loading.style.display = 'inline-block';
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Reset loading
+                btnText.style.display = 'inline';
+                loading.style.display = 'none';
+                
+                // Show success message
+                showMessage('Password reset link sent to your email', 'success');
+                
+                // Reset form
+                document.getElementById('resetEmail').value = '';
+                
+                // Return to login after delay
+                setTimeout(() => {
+                    showLogin();
+                }, 3000);
+            }, 2000);
+        });
+        
+        // Event listeners
+        loginTab.addEventListener('click', showLogin);
+        registerTab.addEventListener('click', showRegister);
+        document.getElementById('forgotPassword').addEventListener('click', showForgotPassword);
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initForms);
+        
+        // Add hover effects to form inputs
+        document.querySelectorAll('.form-input').forEach(input => {
+            input.addEventListener('focus', function() {
+                gsap.to(this, {
+                    scale: 1.02,
+                    duration: 0.3,
+                    ease: "power2.out"
+                });
+            });
+            
+            input.addEventListener('blur', function() {
+                gsap.to(this, {
+                    scale: 1,
+                    duration: 0.3,
+                    ease: "power2.out"
+                });
+            });
+        });
+        
+        // Add hover effects to buttons
+        document.querySelectorAll('.auth-btn').forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                gsap.to(this, {
+                    scale: 1.05,
+                    duration: 0.3,
+                    ease: "back.out(1.7)"
+                });
+            });
+            
+            btn.addEventListener('mouseleave', function() {
+                gsap.to(this, {
+                    scale: 1,
+                    duration: 0.3,
+                    ease: "power2.out"
+                });
+            });
+        });
+        
+        // Add animation to social buttons
+        document.querySelectorAll('.social-btn').forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                const icon = this.querySelector('i');
+                gsap.to(icon, {
+                    rotation: 360,
+                    duration: 0.6,
+                    ease: "back.out(1.7)"
+                });
+            });
+        });
+    </script>
+</body>
+</html>
